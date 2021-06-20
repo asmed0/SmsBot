@@ -1,4 +1,4 @@
-package cmd
+package DiscordBot
 
 type DiscordData struct {
 	Token    string   `json:"token"`
