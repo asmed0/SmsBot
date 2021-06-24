@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"syscall"
 )
 
 func GetSms(session *LastSession) string {
@@ -41,8 +40,6 @@ func GetSms(session *LastSession) string {
 	if jsonPtr.Error == "Non" {
 		return jsonPtr.Sms
 	} else {
-		fmt.Println(jsonPtr.Error)
-		syscall.Exit(-1)
+		return "Problem whilst retrieving sms code, contact support!"
 	}
-	return "Problem whilst retrieving sms code, contact support!" //Unreachable code
 }
