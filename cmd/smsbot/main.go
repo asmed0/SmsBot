@@ -1,8 +1,8 @@
 package main
 
 import (
-	"SmsBot/internal/Database"
-	"SmsBot/internal/DiscordBot"
+	"smsbot/internal/Database"
+	"smsbot/internal/DiscordBot"
 	"fmt"
 	"net/http"
 	"os"
