@@ -1,7 +1,7 @@
 package Database
 
 import (
-	"SmsBot/configs"
+	"smsbot/configs"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
