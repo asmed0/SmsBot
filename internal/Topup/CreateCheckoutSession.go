@@ -41,5 +41,5 @@ func CreateCheckoutSession(discordID string, qty int) string {
 
 	Database.AddPaymentSecret(discordID, session.ID)
 
-	return session.ID + "#fidkdWxOYHwnPyd1blpxYHZxWlFcampIVGRwc2FAQXQwMUtsUXVtTDJvfScpJ2hsYXYnP34nYnBsYSc%2FJ2YwZDEzYGBmKGcyNzIoMTxkZig9Y2Y3KGc0YD1gZ2A0ZGRnN2QwZjxmZCcpJ2hwbGEnPydgNzM2MDA2ZigwYTU9KDEwNDIoZzYzNihhPDI9YzMzZGBgM2c1NGZjPWcnKSd2bGEnPydmYTFmYTYxPCg2PTw8KDE2MGMoPTM9Zig8ZzI9PTJjN2Q1MzMxYzdkNWAneCknZ2BxZHYnP15YKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSd3YGNgd3dgd0p3bGJsayc%2FJ21xcXU%2FKippamZkaW1qdnE%2FNjU0NzYneCUl"
+	return session.ID
 }
