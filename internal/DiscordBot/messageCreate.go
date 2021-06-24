@@ -1,7 +1,7 @@
 package DiscordBot
 
 import (
-	"SmsBot/configs"
+	"smsbot/configs"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"log"

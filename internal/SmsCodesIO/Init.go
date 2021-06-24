@@ -1,6 +1,6 @@
 package SmsCodesIO
 
-import "SmsBot/configs"
+import "smsbot/configs"
 
 func Init() *Session {
 	config := configs.SmsCodesIOConfigs()

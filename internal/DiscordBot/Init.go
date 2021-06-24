@@ -1,6 +1,6 @@
 package DiscordBot
 
-import "SmsBot/configs"
+import "smsbot/configs"
 
 func Init() {
 	config := configs.DBotConfigs()
