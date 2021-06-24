@@ -11,7 +11,7 @@ func DBotConfigs() *DBotStruct{
 			{"code", `Use the !code command to retrieve the latest received sms`},
 			{"balance", `Use the !balance command to check your SmsBot balance`},
 			{"topup", `Use the !topup command to receive a payment link to purchase more SmsBot balance`},
-			{"help", `Use the !help command for more information on the available commands`}},
+			{"fhelp", `Use the !help command for more information on the available commands`}},
 	}
 	return config
 }
