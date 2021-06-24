@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func newMember(s *discordgo.Session, m *discordgo.GuildMemberAdd){
+func newMember(s *discordgo.Session, m *discordgo.GuildMemberUpdate){
 	directMessage, err := s.UserChannelCreate(m.User.ID)
 	if err != nil {
 		log.Panic(err)

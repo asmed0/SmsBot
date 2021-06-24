@@ -2,7 +2,6 @@ package DiscordBot
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"log"
 	"smsbot/configs"
 	"smsbot/internal/Database"
 	"smsbot/internal/SmsCodesIO"
@@ -30,7 +29,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//opening a dm channel
 	directMessage, err := s.UserChannelCreate(m.Author.ID)
 	if err != nil {
-		log.Panic(err)
+		return
 	}
 
 	embedMsg := &discordgo.MessageEmbed{
