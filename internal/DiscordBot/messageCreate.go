@@ -1,10 +1,10 @@
 package DiscordBot
 
 import (
-	"smsbot/configs"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"log"
+	"smsbot/configs"
 	"smsbot/internal/Database"
 	"smsbot/internal/SmsCodesIO"
 	"smsbot/internal/tools"
