@@ -17,7 +17,7 @@ func Init() {
 
 	tmpls, _ := template.ParseFiles(filepath.Join("templates", "index.html"))
 
-	http.HandleFunc("/topup", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := tmpls.Lookup("index.html")
 		tmpl.Execute(w, map[string]string{"Key": publishableKey})
 	})
