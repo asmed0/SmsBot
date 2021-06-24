@@ -87,7 +87,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 					qty = 5 //minimum 5 codes per purchase
 				}
 				embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, qty)
-				embedMsg.Title = "Click here to checkout " + strings.Fields(command)[1] + " tokens"
+				embedMsg.Title = "Click here to checkout " + strconv.Itoa(qty) + " tokens"
 			}else{
 				embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, 10) //default 10 tokens
 				embedMsg.Title = "Click here to checkout 10 tokens"
