@@ -19,7 +19,7 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	http.Handle("/", http.FileServer(http.Dir(wd+"/internal/Topup/public")))
+	http.Handle("/lol", http.FileServer(http.Dir(wd+"/internal/Topup/public")))
 	http.HandleFunc("/success", checkSuccess) //handle success, add balance
 	http.HandleFunc("/create-checkout-session", createCheckoutSession)
 	addr := ":" + os.Getenv("PORT")
