@@ -20,7 +20,7 @@ func CreateCheckoutSession(discordID string, qty int) string {
 		TaxRates: nil,
 	}
 
-	domain := "http://" + os.Getenv("HEROKU_APP_NAME") + ".herokuapp.com"
+	domain := os.Getenv("HOSTURL")
 	params := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{
 			"card",
