@@ -46,46 +46,46 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 	}
 
-	if bool == true { //slicing a multidimensional slice has us jumping commands by +2 - ik there's better ways xdxd
+	if bool == true {
 		switch key {
 		case 0: //food command
 			embedMsg.Title = "+" + Database.UpdateSession(m.Author.ID, SmsCodesIO.Init())
 			embedMsg.Description = "SmsBot by SlotTalk - Use !code command to retrieve verification code"
 
 			embedMsg.Color = 1752220 //aqua color
-			s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-			s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)]) //stripping off +44
+			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+			go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)]) //stripping off +44
 
-		case 2: //code command
+		case 1: //code command
 			returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
 			if strings.Contains(returnedCode, "not") {
 				embedMsg.Title = returnedCode
 				embedMsg.Description = "SmsBot by SlotTalk - Try again in a moment or resend the code!\n *Your balance is untouched"
 				embedMsg.Color = 15158332 //red color
 
-				s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 			} else {
 				embedMsg.Title = returnedCode
 				embedMsg.Description = "SmsBot by SlotTalk - Use !balance command to check your balance!\n *1 Token has been deducted from your balance"
 				embedMsg.Color = 3066993 //green color
 
 				go Database.UpdateBalance(-1, m.Author.ID)
-				s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 			}
-		case 4:
+		case 2:
 			embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
 			embedMsg.Description = "SmsBot by SlotTalk - Use !topup command to purchase more tokens!\n \n1 successfully retrieved verification code = 1 token redeemed!"
 			embedMsg.Color = 10181046 //purple color
 
-			s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		case 6:
+			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+		case 3:
 			fmt.Println(data.Commands[key])
-		case 8:
+		case 4:
 			fmt.Println(data.Commands[key])
 		default:
-			s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //actually not needed since we trim messages but justtt incase
+			go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //actually not needed since we trim messages but justtt incase
 		}
-	} else {
-		fmt.Println(cmds)
+	} else if m.ChannelID == directMessage.ID{
+		go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //if command is in dms person is obv talking to the bot
 	}
 }

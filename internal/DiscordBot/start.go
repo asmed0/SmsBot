@@ -19,9 +19,11 @@ func start(data *DiscordData) {
 
 	// Register the messageCreate func as a callback for MessageCreate events.
 	dg.AddHandler(messageCreate)
+	//dg.AddHandler(newMember) //new members get greet message and bot instructions - will implement later
 
-	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
+	dg.Identify.Intents = discordgo.IntentsDirectMessages //accept dms aswell
+
 
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()

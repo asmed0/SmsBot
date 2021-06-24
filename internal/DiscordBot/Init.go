@@ -12,6 +12,6 @@ func Init() {
 			{"help", `Use the !help command for more information on the available commands`}},
 	}
 
-	getConfig(true, data)
+	go getConfig(true, data)
 	start(data)
 }
