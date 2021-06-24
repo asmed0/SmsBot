@@ -1,13 +1,10 @@
 package Topup
 
 import (
-	"encoding/json"
 	"github.com/stripe/stripe-go"
-	"github.com/stripe/stripe-go/checkout/session"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 
@@ -21,12 +18,12 @@ func Init() {
 
 	http.Handle("/", http.FileServer(http.Dir(wd+"/internal/Topup/public")))
 	http.HandleFunc("/success", checkSuccess) //handle success, add balance
-	http.HandleFunc("/create-checkout-session", createCheckoutSession)
+	//http.HandleFunc("/create-checkout-session", createCheckoutSession)
 	addr := ":" + os.Getenv("PORT")
 	http.ListenAndServe(addr, nil)
 }
 
-func createCheckoutSession(w http.ResponseWriter, req *http.Request) {
+/*func createCheckoutSession(w http.ResponseWriter, req *http.Request) {
 	item := &stripe.CheckoutSessionLineItemParams{
 		Amount:   stripe.Int64(500),
 		Currency: stripe.String(string(stripe.CurrencySEK)),
@@ -55,3 +52,4 @@ func createCheckoutSession(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 }
+*/
