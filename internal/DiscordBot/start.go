@@ -22,7 +22,7 @@ func start(data *DiscordData) {
 	//dg.AddHandler(newMember) //new members get greet message and bot instructions - will implement later
 
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
-	dg.Identify.Intents = discordgo.IntentsDirectMessages //accept dms aswell
+	//dg.Identify.Intents = discordgo.IntentsDirectMessages //accept dms aswell
 
 
 	// Open a websocket connection to Discord and begin listening.
