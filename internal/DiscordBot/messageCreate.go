@@ -49,12 +49,21 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if bool == true {
 		switch key {
 		case 0: //food command
-			embedMsg.Title = "+" + Database.UpdateSession(m.Author.ID, SmsCodesIO.Init())
-			embedMsg.Description = "SmsBot by SlotTalk - Use !code command to retrieve verification code"
+			number := Database.UpdateSession(m.Author.ID, SmsCodesIO.Init())
+			if number != "zerobal"{
+				embedMsg.Title = "+" + Database.UpdateSession(m.Author.ID, SmsCodesIO.Init())
+				embedMsg.Description = "SmsBot by SlotTalk - Use !code command to retrieve verification code"
 
-			embedMsg.Color = 1752220 //aqua color
+				embedMsg.Color = 1752220 //aqua color
+				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+				go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)]) //stripping off +44
+				return
+			}
+			embedMsg.Title = "No tokens left :("
+			embedMsg.Description = "SmsBot by SlotTalk - Use !topup command to purchase tokens!"
+			embedMsg.Color = 15158332 //red color
+
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-			go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)]) //stripping off +44
 
 		case 1: //code command
 			returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
