@@ -1,13 +1,10 @@
 package Database
 
 import (
-	"context"
-	"log"
-	"time"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
 )
 
 var err error
@@ -30,14 +27,13 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	dbsession.ctx, _ = context.WithTimeout(context.Background(), 1000*time.Second)
-	err = dbsession.client.Connect(dbsession.ctx)
+	err = dbsession.client.Connect(nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	//defer dbsession.client.Disconnect(dbsession.ctx) //kills the server, will reroute later
-	err = dbsession.client.Ping(dbsession.ctx, readpref.Primary())
+	err = dbsession.client.Ping(nil, readpref.Primary())
 	if err != nil {
 		log.Fatal(err)
 	}
