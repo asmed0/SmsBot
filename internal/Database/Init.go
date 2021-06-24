@@ -1,6 +1,7 @@
 package Database
 
 import (
+	"SmsBot/configs"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -10,12 +11,13 @@ import (
 var err error
 
 func Init() {
+	dbConfigs := configs.DBConfigs()
 	dbsession := &DatabaseSession{
-		uri:        "cluster0.zc0f8.mongodb.net",
-		user:       "dbUser",
-		pass:       "arfiestysexu",
-		database:   "Database",
-		collection: "SmsBot",
+		uri:        dbConfigs.Uri,
+		user:       dbConfigs.User,
+		pass:       dbConfigs.Pass,
+		database:   dbConfigs.Database,
+		collection: dbConfigs.Collection,
 	}
 
 	dbsession.client, err = mongo.NewClient(options.Client().ApplyURI("mongodb+srv://" + dbsession.user +

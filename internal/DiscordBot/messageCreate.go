@@ -1,6 +1,7 @@
 package DiscordBot
 
 import (
+	"SmsBot/configs"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"log"
@@ -14,7 +15,7 @@ import (
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	data := getConfig(false, &DiscordData{})
+	data := configs.DBotConfigs()
 
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.

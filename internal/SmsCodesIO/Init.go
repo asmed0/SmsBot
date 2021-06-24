@@ -1,11 +1,14 @@
 package SmsCodesIO
 
+import "SmsBot/configs"
+
 func Init() *Session {
+	config := configs.SmsCodesIOConfigs()
 	session := &Session{
-		ApiKey:      "dd6cdc3f-bdd2-4250-8f8a-220390c72f6c",
-		Country:     "UK",
-		ServiceID:   "462f7a96-98e9-44a5-9407-47d3104519bd",
-		SerciceName: "Foodora",
+		ApiKey:      config.Apikey,
+		Country:     config.Country,
+		ServiceID:   config.ServiceID,
+		SerciceName: config.ServiceName,
 		Number:      "",
 		SecurityID:  "",
 	}
