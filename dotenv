@@ -8,3 +8,7 @@ smscodes_apikey=
 smscodes_country=
 smscodes_serviceid=
 smscodes_servicename=
+stripe_key=
+stripe_pk_encrypted=
+PORT=
+HOSTURL=
