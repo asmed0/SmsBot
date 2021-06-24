@@ -1,7 +1,6 @@
 package DiscordBot
 
 import (
-	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"log"
 	"smsbot/configs"
@@ -36,7 +35,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	embedMsg := &discordgo.MessageEmbed{
 		Title:       "Unknown command, use !help command for more information on available commands!",
-		Description: "SmsBot by SlotTalk",
+		Fields:  []*discordgo.MessageEmbedField{},
 		Provider: &discordgo.MessageEmbedProvider{
 			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
 			Name: "SlotTalk SMSBOT",
@@ -98,7 +97,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 
 		case 4:
-			fmt.Println(data.Commands[key])
+			embedMsg.Title = "Available commands below"
+			for i := 0; i < len(data.Commands); i++ {
+				embedMsg.Fields = append(embedMsg.Fields, &discordgo.MessageEmbedField{
+					Name:   data.Prefix + data.Commands[i][0],
+					Value:   data.Commands[i][1],
+					Inline: false,
+				})
+			} //looping existing commands
+
+			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 		default:
 			go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //actually not needed since we trim messages but justtt incase
 		}
