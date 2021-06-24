@@ -7,6 +7,7 @@ import (
 	"smsbot/configs"
 	"smsbot/internal/Database"
 	"smsbot/internal/SmsCodesIO"
+	"smsbot/internal/Topup"
 	"smsbot/internal/tools"
 	"strconv"
 	"strings"
@@ -23,9 +24,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	//filtering messages, shouldve used .trim() but idk bruh
 	cmds := tools.SliceSlicer(data.Commands)
-	key, bool := tools.Find(cmds, strings.ToLower(m.Content[1:len(m.Content)]))
+	command := strings.TrimLeft(strings.ToLower(m.Content),data.Prefix)
+	key, bool := tools.Find(cmds,strings.Fields(command)[0])
 
 	//opening a dm channel
 	directMessage, err := s.UserChannelCreate(m.Author.ID)
@@ -80,7 +81,19 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 		case 3:
-			fmt.Println(data.Commands[key])
+			if len(strings.Fields(command)) > 1{
+				qty,_ := strconv.Atoi(strings.Fields(command)[1])
+				embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, qty)
+				embedMsg.Title = "Click here to checkout " + strings.Fields(command)[1] + " tokens"
+			}else{
+				embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, 10) //default 10 tokens
+				embedMsg.Title = "Click here to checkout 10 tokens"
+
+			}
+			embedMsg.Description = "SmsBot by SlotTalk - tokens will automatically be added to your balance after!"
+			embedMsg.Color = 15277667 //pink color
+			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+
 		case 4:
 			fmt.Println(data.Commands[key])
 		default:
