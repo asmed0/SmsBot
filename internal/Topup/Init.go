@@ -9,7 +9,7 @@ import (
 
 
 func Init() {
-	stripe.Key = "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+	stripe.Key = os.Getenv("stripe_key")
 
 	wd, err := os.Getwd()
 	if err != nil {
