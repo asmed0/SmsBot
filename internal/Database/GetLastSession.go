@@ -1,7 +1,7 @@
 package Database
 
 import (
-	"fmt"
+	"github.com/getsentry/raven-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"smsbot/internal/SmsCodesIO"
 )
@@ -12,7 +12,7 @@ func GetLastSession(discordID string) *SmsCodesIO.LastSession {
 
 	err := dbsession.collectionPtr.FindOne(nil, bson.M{"discord_id":discordID}).Decode(data)
 	if err != nil{
-		fmt.Println(err)
+		raven.CaptureErrorAndWait(err, nil)
 	}
 
 	lastSession := &SmsCodesIO.LastSession{

@@ -1,6 +1,7 @@
 package Topup
 
 import (
+	"github.com/getsentry/raven-go"
 	"github.com/stripe/stripe-go"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ func Init() {
 
 	wd, err := os.Getwd()
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		log.Fatal(err)
 	}
 

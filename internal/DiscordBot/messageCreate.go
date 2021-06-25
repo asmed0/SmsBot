@@ -2,6 +2,7 @@ package DiscordBot
 
 import (
 	"github.com/bwmarrin/discordgo"
+	"github.com/getsentry/raven-go"
 	"smsbot/configs"
 	"smsbot/internal/Database"
 	"smsbot/internal/SmsCodesIO"
@@ -29,6 +30,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//opening a dm channel
 	directMessage, err := s.UserChannelCreate(m.Author.ID)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		return
 	}
 

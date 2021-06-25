@@ -3,6 +3,7 @@ package SmsCodesIO
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/getsentry/raven-go"
 	"io/ioutil"
 	"net/http"
 	"syscall"
@@ -20,11 +21,13 @@ func getNumber(data *Session) {
 	req, err := http.NewRequest(method, url, nil)
 
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
 		return
 	}
 	res, err := client.Do(req)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
 		return
 	}
@@ -32,6 +35,7 @@ func getNumber(data *Session) {
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
 		return
 	}
@@ -42,6 +46,7 @@ func getNumber(data *Session) {
 		data.Number = jsonPtr.Number
 		data.SecurityID = jsonPtr.SecurityID
 	} else {
+		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(jsonPtr.Error)
 		syscall.Exit(-1)
 	}

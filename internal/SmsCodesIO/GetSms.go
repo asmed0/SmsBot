@@ -3,6 +3,7 @@ package SmsCodesIO
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/getsentry/raven-go"
 	"io/ioutil"
 	"net/http"
 )
@@ -18,11 +19,13 @@ func GetSms(session *LastSession) string {
 	req, err := http.NewRequest(method, url, nil)
 
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
 		return "Problem whilst retrieving sms code, contact support!"
 	}
 	res, err := client.Do(req)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
 		return "Problem whilst retrieving sms code, contact support!"
 	}
@@ -30,6 +33,7 @@ func GetSms(session *LastSession) string {
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
 		return "Problem whilst retrieving sms code, contact support!"
 	}

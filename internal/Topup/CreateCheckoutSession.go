@@ -1,6 +1,7 @@
 package Topup
 
 import (
+	"github.com/getsentry/raven-go"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/checkout/session"
 	"log"
@@ -36,6 +37,7 @@ func CreateCheckoutSession(discordID string, qty int) string {
 	session, err := session.New(params)
 
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		log.Printf("session.New: %v", err)
 	}
 
