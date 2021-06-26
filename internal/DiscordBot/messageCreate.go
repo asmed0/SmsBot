@@ -41,7 +41,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		raven.CaptureErrorAndWait(err, nil)
 		return
 	}
-	
+
 
 	embedMsg := &discordgo.MessageEmbed{
 		Title:  "Unknown command, use !fhelp command for more information on available commands!",
@@ -63,45 +63,53 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "food": //food command
 		getNumber(embedMsg, m.Author.ID, "Foodora", -1)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
 	case "wolt":
 		getNumber(embedMsg, m.Author.ID, "Wolt", -2)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
 	case "bolt":
 		getNumber(embedMsg, m.Author.ID, "Bolt", -2)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
 	case "tier":
 		getNumber(embedMsg, m.Author.ID, "Tier", -2)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
 	case "code": //code command
 		returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
-
 		if returnedCode == "Err" {
 			embedMsg.Title = "Message not received yet, try again in a moment"
 			embedMsg.Color = 15158332 //red color
 
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		} else if returnedCode == "ProviderErr"{
+			go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
+		} else if returnedCode == "ProviderErr" {
 			embedMsg.Title = "Seems like our provider had an error, sorry for this"
 			embedMsg.Description = "Your balance has been reimbursed"
 			embedMsg.Color = 15158332 //red color
 			go Database.UpdateBalance(2, m.Author.ID)
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		}else{
+			go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
+		} else {
 			embedMsg.Title = returnedCode
 			embedMsg.Description = "Use !balance command to check your balance!"
 			embedMsg.Color = 3066993 //green color
-			lastSession := Database.GetLastSession(m.Author.ID)
-			Database.UpdateSession(m.Author.ID, &SmsCodesIO.Session{
-				ApiKey:      lastSession.Apikey,
-				Country:     lastSession.Country,
-				ServiceID:   lastSession.ServiceID,
-				SerciceName: lastSession.ServiceName,
-				Number:      lastSession.Number,
-				SecurityID:  lastSession.SecurityID,
-			}, true)
 
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+			go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
 		}
+
+		lastSession := Database.GetLastSession(m.Author.ID)
+		Database.UpdateSession(m.Author.ID, &SmsCodesIO.Session{
+			ApiKey:      lastSession.Apikey,
+			Country:     lastSession.Country,
+			ServiceID:   lastSession.ServiceID,
+			SerciceName: lastSession.ServiceName,
+			Number:      lastSession.Number,
+			SecurityID:  lastSession.SecurityID,
+		}, true) //disposing our number
+
 	case "balance": //balance command
 		embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
 		embedMsg.Description = "Use !topup command to purchase more tokens!\n \n1 successfully retrieved verification code = 1 token redeemed!"

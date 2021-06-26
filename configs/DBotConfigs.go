@@ -2,6 +2,8 @@ package configs
 
 import "os"
 
+var token string
+var cmds [][]string
 func DBotConfigs() *DBotStruct{
 	config := &DBotStruct{
 		Token:    os.Getenv("discord_token"),
