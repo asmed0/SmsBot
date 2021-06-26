@@ -19,7 +19,7 @@ func UpdateSession(discordID string, lastSession *SmsCodesIO.Session, dispose bo
 		return "zerobal" //no balance initialized user
 	}
 
-	if userData.Balance == 0{
+	if userData.Balance <= 0{
 		return "zerobal"
 	}
 
