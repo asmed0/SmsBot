@@ -25,7 +25,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	//Ignore all messages outside #commands channel
-	if m.ChannelID != os.Getenv("commands_channel"){
+	if m.ChannelID != os.Getenv("commands_channel") {
 		return
 	}
 
@@ -58,14 +58,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if cbool == true { //fast way to determine if we want to handle this message or not
 		switch ckey {
 		case 0: //food command
-			if !(Database.GetBalance(m.Author.ID) <= 0){
+			if !(Database.GetBalance(m.Author.ID) <= 0) {
 				lastSession := Database.GetLastSession(m.Author.ID)
-				isLastSessionDisposed := !lastSession.IsDisposed
-				if isLastSessionDisposed {
-					embedMsg.Title = "Please use the !code command to dispose previous number before requesting a new one"
-					embedMsg.Color = 15158332 //red color
-					go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-					return
+				if lastSession.Apikey != "" {
+					isLastSessionDisposed := !lastSession.IsDisposed
+					if isLastSessionDisposed {
+						embedMsg.Title = "Please use the !code command to dispose previous number before requesting a new one"
+						embedMsg.Color = 15158332 //red color
+						go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+						return
+					}
 				}
 
 				number := Database.UpdateSession(m.Author.ID, SmsCodesIO.Init(), false)
@@ -91,7 +93,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 		case 1: //code command
 			returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
-			if returnedCode == "Err"  {
+			if returnedCode == "Err" {
 				embedMsg.Title = "Message not received yet, try again in a moment"
 				embedMsg.Color = 15158332 //red color
 
