@@ -43,7 +43,9 @@ func GetSms(session *LastSession) string {
 	json.Unmarshal(body, jsonPtr)
 	if jsonPtr.Error == "Non" && jsonPtr.Sms != "Message not received yet" {
 		return jsonPtr.Sms
-	} else {
+	} else if jsonPtr.Error == "UnknownTransaction"{
+		return "ProviderErr"
+	}else{
 		return "Err"
 	}
 }

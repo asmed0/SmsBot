@@ -8,6 +8,7 @@ import (
 	"smsbot/internal/Database"
 	"smsbot/internal/SmsCodesIO"
 	"smsbot/internal/Topup"
+	"smsbot/internal/tools"
 	"strconv"
 	"strings"
 )
@@ -40,11 +41,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		raven.CaptureErrorAndWait(err, nil)
 		return
 	}
-
-	if m.Author.ID == "341917332974862340"{
-		s.ChannelMessageSend(directMessage.ID, "Fucking hell Santa calla mig igen... Jag sa ju till dig att jag hatar honom")
-		s.ChannelMessageSend(directMessage.ID, "Oj, jag skulle skicka det där meddelandet till Ahmed loool")
-	} //memeing with a friend lolzz
+	
 
 	embedMsg := &discordgo.MessageEmbed{
 		Title:  "Unknown command, use !fhelp command for more information on available commands!",
@@ -64,16 +61,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	switch strings.Fields(command)[0] {
 	case "food": //food command
-		getNumber(embedMsg, m.Author.ID,"Foodora", -1)
+		getNumber(embedMsg, m.Author.ID, "Foodora", -1)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "wolt":
-		getNumber(embedMsg, m.Author.ID,"Wolt", -2)
+		getNumber(embedMsg, m.Author.ID, "Wolt", -2)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "bolt":
-		getNumber(embedMsg, m.Author.ID,"Bolt", -2)
+		getNumber(embedMsg, m.Author.ID, "Bolt", -2)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "tier":
-		getNumber(embedMsg, m.Author.ID,"Tier", -2)
+		getNumber(embedMsg, m.Author.ID, "Tier", -2)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "code": //code command
 		returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
@@ -83,7 +80,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			embedMsg.Color = 15158332 //red color
 
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		} else {
+		} else if returnedCode == "ProviderErr"{
+			embedMsg.Title = "Seems like our provider had an error, sorry for this"
+			embedMsg.Description = "Your balance has been reimbursed"
+			embedMsg.Color = 15158332 //red color
+			go Database.UpdateBalance(2, m.Author.ID)
+			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+		}else{
 			embedMsg.Title = returnedCode
 			embedMsg.Description = "Use !balance command to check your balance!"
 			embedMsg.Color = 3066993 //green color
@@ -134,6 +137,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	default:
-		go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //actually not needed since we trim messages but justtt incase
+		_, isAdmin := tools.Find(m.Member.Roles, os.Getenv("admin_role"))
+		if !isAdmin {
+			go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //if member writes unknown message give them fhelp embed
+		}
 	}
 }
