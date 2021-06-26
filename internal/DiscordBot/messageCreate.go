@@ -30,15 +30,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	//Ignore all messages outside #commands channel
-	if m.ChannelID != os.Getenv("commands_channel") {
-		return
+	//if is Admin
+	_, isAdmin := tools.Find(m.Member.Roles, os.Getenv("admin_role"))
+
+	//Ignore all messages outside #commands channel if its not an admin
+	if !isAdmin {
+		if m.ChannelID != os.Getenv("commands_channel") {
+			return
+		}
 	}
 
 	//opening a dm channel
 	directMessage, err := s.UserChannelCreate(m.Author.ID)
 	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
+		raven.CaptureErrorAndWait(err, nil) //shouldnt happen but ait
 		return
 	}
 
@@ -144,8 +149,50 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		} //looping existing commands
 
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+
+	case "addtokens": //this is an admin only command! //example: !addtokens 50 @Santa
+		if isAdmin {
+			if len(m.Mentions) < 1{ //no user specified err
+				embedMsg.Title = "No user specified"
+				embedMsg.Description = "!addtokens command example: !addtokens 50 @Santa"
+				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+				return
+			}
+			prevBal := Database.GetBalance(m.Mentions[0].ID)
+			toAdd, err := strconv.Atoi(strings.Fields(command)[1])
+			if err != nil{
+				embedMsg.Title = "Incorrect amount to add, try again.."
+				embedMsg.Description = "!addtokens command example: !addtokens 50 @Santa"
+				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+				return
+			}
+
+			Database.UpdateBalance(toAdd, m.Mentions[0].ID)
+			embedMsg.Title = m.Mentions[0].Username + "'s token balance has been updated"
+			embedMsg.Fields = []*discordgo.MessageEmbedField{
+				&discordgo.MessageEmbedField{
+					Name:   "Previous balance",
+					Value:  strconv.Itoa(prevBal),
+					Inline: true,
+				},
+				&discordgo.MessageEmbedField{
+					Name:   "New balance",
+					Value:  strconv.Itoa(Database.GetBalance(m.Mentions[0].ID)),
+					Inline: true,
+				},
+			}
+			//opening a dm channel to user
+			userDm, err := s.UserChannelCreate(m.Mentions[0].ID)
+			if err != nil {
+				raven.CaptureErrorAndWait(err, nil) //shouldnt happen but ait
+				return
+			}
+			go s.ChannelMessageSendEmbed(userDm.ID, embedMsg)
+			go s.ChannelMessageSendEmbed(os.Getenv("log_channel"), embedMsg)
+
+		}
 	default:
-		_, isAdmin := tools.Find(m.Member.Roles, os.Getenv("admin_role"))
+
 		if !isAdmin {
 			go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //if member writes unknown message give them fhelp embed
 		}
