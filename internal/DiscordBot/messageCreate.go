@@ -23,14 +23,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
+
 	//Ignore all messages outside #commands channel
 	if m.ChannelID != os.Getenv("commands_channel"){
 		return
 	}
 
+	//command slice handling
 	cmds := tools.SliceSlicer(data.Commands)
 	command := strings.TrimLeft(strings.ToLower(m.Content), data.Prefix)
-	key, bool := tools.Find(cmds, strings.Fields(command)[0])
+	ckey, cbool := tools.Find(cmds, strings.Fields(command)[0])
 
 	//opening a dm channel
 	directMessage, err := s.UserChannelCreate(m.Author.ID)
@@ -53,8 +55,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 	}
 
-	if bool == true {
-		switch key {
+	if cbool == true { //fast way to determine if we want to handle this message or not
+		switch ckey {
 		case 0: //food command
 			if !(Database.GetBalance(m.Author.ID) <= 0){
 				lastSession := Database.GetLastSession(m.Author.ID)
@@ -73,6 +75,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 					embedMsg.Description = "SmsBot by SlotTalk - Use !code command to retrieve verification code"
 
 					embedMsg.Color = 1752220 //aqua color
+					go Database.UpdateBalance(-1, m.Author.ID)
 					go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 					go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)]) //stripping off +44
 					return
@@ -109,16 +112,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 					SecurityID:  lastSession.SecurityID,
 				}, true)
 
-				go Database.UpdateBalance(-1, m.Author.ID)
 				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 			}
-		case 2:
+		case 2: //balance command
 			embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
 			embedMsg.Description = "SmsBot by SlotTalk - Use !topup command to purchase more tokens!\n \n1 successfully retrieved verification code = 1 token redeemed!"
 			embedMsg.Color = 10181046 //purple color
 
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		case 3:
+		case 3: //topup command
 			if len(strings.Fields(command)) > 1 {
 				qty, _ := strconv.Atoi(strings.Fields(command)[1])
 				if qty < 1 || qty > 50000 {
@@ -135,7 +137,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			embedMsg.Color = 15277667 //pink color
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 
-		case 4:
+		case 4: //fhelp command
 			embedMsg.Title = "Available commands below"
 			for i := 0; i < len(data.Commands); i++ {
 				embedMsg.Fields = append(embedMsg.Fields, &discordgo.MessageEmbedField{
