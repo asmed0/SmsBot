@@ -92,6 +92,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 			}
 		case 1: //code command
+			lastSession :=  Database.GetLastSession(m.Author.ID)
+			Database.UpdateSession(m.Author.ID, &SmsCodesIO.Session{
+				ApiKey:      lastSession.Apikey,
+				Country:     lastSession.Country,
+				ServiceID:   lastSession.ServiceID,
+				SerciceName: lastSession.ServiceName,
+				Number:      lastSession.Number,
+				SecurityID:  lastSession.SecurityID,
+			},true) //disposing the number to be able to call food again
 			returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
 			if returnedCode == "Err" {
 				embedMsg.Title = "Message not received yet, try again in a moment"
