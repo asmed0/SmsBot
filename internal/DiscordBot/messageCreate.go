@@ -23,6 +23,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	//Ignore other bots messages
+	if m.Author.Bot {
+		return
+	}
+
 	//Ignore all messages outside #commands channel
 	if m.ChannelID != os.Getenv("commands_channel") {
 		return
