@@ -21,13 +21,13 @@ func GetSms(session *LastSession) string {
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
-		return "Problem whilst retrieving sms code, contact support!"
+		return "Err"
 	}
 	res, err := client.Do(req)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
-		return "Problem whilst retrieving sms code, contact support!"
+		return "Err"
 	}
 	defer res.Body.Close()
 
@@ -35,15 +35,15 @@ func GetSms(session *LastSession) string {
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
-		return "Problem whilst retrieving sms code, contact support!"
+		return "Err"
 	}
 
 	jsonPtr := &GetSmsResponse{}
 
 	json.Unmarshal(body, jsonPtr)
-	if jsonPtr.Error == "Non" {
+	if jsonPtr.Error == "Non" || jsonPtr.Sms != "Message not received yet" {
 		return jsonPtr.Sms
 	} else {
-		return "Problem whilst retrieving sms code, contact support!"
+		return "Err"
 	}
 }

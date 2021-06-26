@@ -84,9 +84,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 		case 1: //code command
 			returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
-			if strings.Contains(returnedCode, "not") {
-				embedMsg.Title = returnedCode
-				embedMsg.Description = "SmsBot by SlotTalk - Try again in a moment or resend the code!\n *Your balance is untouched"
+			if returnedCode == "err"  {
+				embedMsg.Title = "Message not received yet, try again in a moment"
+				embedMsg.Description = "SmsBot by SlotTalk \n *Your balance is untouched"
 				embedMsg.Color = 15158332 //red color
 
 				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
