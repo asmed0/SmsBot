@@ -54,16 +54,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	switch strings.Fields(command)[0] {
 	case "food": //food command
 		getNumber(embedMsg, m.Author.ID,"Foodora", -1)
-		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)])
+		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "wolt":
 		getNumber(embedMsg, m.Author.ID,"Wolt", -2)
-		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)])
+		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "bolt":
 		getNumber(embedMsg, m.Author.ID,"Bolt", -2)
-		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)])
+		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "tier":
 		getNumber(embedMsg, m.Author.ID,"Tier", -2)
-		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)])
+		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "code": //code command
 		returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
 
