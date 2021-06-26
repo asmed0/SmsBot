@@ -19,4 +19,5 @@ type SmsCodesIOStruct struct {
 	Country string
 	ServiceID string
 	ServiceName string
+	Price int
 }

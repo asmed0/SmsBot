@@ -4,8 +4,8 @@ import (
 	"smsbot/configs"
 )
 
-func Init() *Session {
-	config := configs.SmsCodesIOConfigs()
+func Init(service string) *Session {
+	config := configs.SmsCodesIOConfigs(service)
 	session := &Session{
 		ApiKey:      config.Apikey,
 		Country:     config.Country,

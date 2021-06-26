@@ -8,7 +8,6 @@ import (
 	"smsbot/internal/Database"
 	"smsbot/internal/SmsCodesIO"
 	"smsbot/internal/Topup"
-	"smsbot/internal/tools"
 	"strconv"
 	"strings"
 )
@@ -28,11 +27,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.ChannelID != os.Getenv("commands_channel") {
 		return
 	}
-
-	//command slice handling
-	cmds := tools.SliceSlicer(data.Commands)
-	command := strings.TrimLeft(strings.ToLower(m.Content), data.Prefix)
-	ckey, cbool := tools.Find(cmds, strings.Fields(command)[0])
 
 	//opening a dm channel
 	directMessage, err := s.UserChannelCreate(m.Author.ID)
@@ -55,103 +49,80 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 	}
 
-	if cbool == true { //fast way to determine if we want to handle this message or not
-		switch ckey {
-		case 0: //food command
-			if !(Database.GetBalance(m.Author.ID) <= 0) {
-				lastSession := Database.GetLastSession(m.Author.ID)
-				if lastSession.Apikey != "" {
-					isLastSessionDisposed := !lastSession.IsDisposed
-					if isLastSessionDisposed {
-						embedMsg.Title = "Please use the !code command to dispose previous number before requesting a new one"
-						embedMsg.Color = 15158332 //red color
-						go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-						return
-					}
-				}
+	command := strings.TrimLeft(strings.ToLower(m.Content), data.Prefix)
 
-				number := Database.UpdateSession(m.Author.ID, SmsCodesIO.Init(), false)
-				if number != "zerobal" {
-					embedMsg.Title = "+" + number
-					embedMsg.Description = "Use !code command to retrieve verification code\n *1 Token has been deducted from your balance"
+	switch strings.Fields(command)[0] {
+	case "food": //food command
+		getNumber(embedMsg, m.Author.ID,"Foodora", -1)
+		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)])
+	case "wolt":
+		getNumber(embedMsg, m.Author.ID,"Wolt", -2)
+		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)])
+	case "bolt":
+		getNumber(embedMsg, m.Author.ID,"Bolt", -2)
+		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)])
+	case "tier":
+		getNumber(embedMsg, m.Author.ID,"Tier", -2)
+		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)])
+	case "code": //code command
+		returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
 
-					embedMsg.Color = 1752220 //aqua color
-					go Database.UpdateBalance(-1, m.Author.ID)
-					go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-					go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)]) //stripping off +44
-					return
-				} else {
-					embedMsg.Title = "No tokens left :("
-					embedMsg.Description = "Use !topup command to purchase tokens!"
-					embedMsg.Color = 15158332 //red color
-					go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-				}
-			} else {
-				embedMsg.Title = "You have no tokens :( Please use the !topup command first"
-				embedMsg.Color = 15158332 //red color
-				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-			}
-		case 1: //code command
-			returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
-			if returnedCode == "Err" {
-				embedMsg.Title = "Message not received yet, try again in a moment"
-				embedMsg.Color = 15158332 //red color
-
-				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-			} else {
-				embedMsg.Title = returnedCode
-				embedMsg.Description = "Use !balance command to check your balance!"
-				embedMsg.Color = 3066993 //green color
-				lastSession := Database.GetLastSession(m.Author.ID)
-				Database.UpdateSession(m.Author.ID, &SmsCodesIO.Session{
-					ApiKey:      lastSession.Apikey,
-					Country:     lastSession.Country,
-					ServiceID:   lastSession.ServiceID,
-					SerciceName: lastSession.ServiceName,
-					Number:      lastSession.Number,
-					SecurityID:  lastSession.SecurityID,
-				}, true)
-
-				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-			}
-		case 2: //balance command
-			embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
-			embedMsg.Description = "Use !topup command to purchase more tokens!\n \n1 successfully retrieved verification code = 1 token redeemed!"
-			embedMsg.Color = 10181046 //purple color
+		if returnedCode == "Err" {
+			embedMsg.Title = "Message not received yet, try again in a moment"
+			embedMsg.Color = 15158332 //red color
 
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		case 3: //topup command
-			if len(strings.Fields(command)) > 1 {
-				qty, _ := strconv.Atoi(strings.Fields(command)[1])
-				if qty < 1 || qty > 50000 {
-					qty = 10 //default to 10
-				}
-				embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, qty)
-				embedMsg.Title = "Click here to checkout " + strconv.Itoa(qty) + " tokens"
-			} else {
-				embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, 10) //default 10 tokens
-				embedMsg.Title = "Click here to checkout 10 tokens"
-
-			}
-			embedMsg.Description = "Tokens will automatically be added to your balance after!"
-			embedMsg.Color = 15277667 //pink color
-			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-
-		case 4: //fhelp command
-			embedMsg.Title = "Available commands below"
-			for i := 0; i < len(data.Commands); i++ {
-				embedMsg.Fields = append(embedMsg.Fields, &discordgo.MessageEmbedField{
-					Name:   data.Prefix + data.Commands[i][0],
-					Value:  data.Commands[i][1],
-					Inline: false,
-				})
-			} //looping existing commands
+		} else {
+			embedMsg.Title = returnedCode
+			embedMsg.Description = "Use !balance command to check your balance!"
+			embedMsg.Color = 3066993 //green color
+			lastSession := Database.GetLastSession(m.Author.ID)
+			Database.UpdateSession(m.Author.ID, &SmsCodesIO.Session{
+				ApiKey:      lastSession.Apikey,
+				Country:     lastSession.Country,
+				ServiceID:   lastSession.ServiceID,
+				SerciceName: lastSession.ServiceName,
+				Number:      lastSession.Number,
+				SecurityID:  lastSession.SecurityID,
+			}, true)
 
 			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		default:
-			go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //actually not needed since we trim messages but justtt incase
 		}
-	} else if m.ChannelID == directMessage.ID {
-		go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //if command is in dms person is obv talking to the bot
+	case "balance": //balance command
+		embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
+		embedMsg.Description = "Use !topup command to purchase more tokens!\n \n1 successfully retrieved verification code = 1 token redeemed!"
+		embedMsg.Color = 10181046 //purple color
+
+		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+	case "topup": //topup command
+		if len(strings.Fields(command)) > 1 {
+			qty, _ := strconv.Atoi(strings.Fields(command)[1])
+			if qty < 1 || qty > 50000 {
+				qty = 10 //default to 10
+			}
+			embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, qty)
+			embedMsg.Title = "Click here to checkout " + strconv.Itoa(qty) + " tokens"
+		} else {
+			embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, 10) //default 10 tokens
+			embedMsg.Title = "Click here to checkout 10 tokens"
+
+		}
+		embedMsg.Description = "Tokens will automatically be added to your balance after!"
+		embedMsg.Color = 15277667 //pink color
+		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+
+	case "fhelp": //fhelp command
+		embedMsg.Title = "Available commands below"
+		for i := 0; i < len(data.Commands); i++ {
+			embedMsg.Fields = append(embedMsg.Fields, &discordgo.MessageEmbedField{
+				Name:   data.Prefix + data.Commands[i][0],
+				Value:  data.Commands[i][1],
+				Inline: false,
+			})
+		} //looping existing commands
+
+		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+	default:
+		go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //actually not needed since we trim messages but justtt incase
 	}
 }
