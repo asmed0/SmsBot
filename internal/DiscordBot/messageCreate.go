@@ -40,6 +40,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	if m.Author.ID == "341917332974862340"{
+		s.ChannelMessageSend(directMessage.ID, "Fucking hell Santa calla mig igen... Jag sa ju till dig att jag hatar honom")
+		s.ChannelMessageSend(directMessage.ID, "Oj, jag skulle skicka det där meddelandet till Ahmed loool")
+	} //memeing with a friend lolzz
+
 	embedMsg := &discordgo.MessageEmbed{
 		Title:  "Unknown command, use !help command for more information on available commands!",
 		Fields: []*discordgo.MessageEmbedField{},
