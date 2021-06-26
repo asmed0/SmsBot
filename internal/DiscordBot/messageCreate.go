@@ -46,7 +46,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	} //memeing with a friend lolzz
 
 	embedMsg := &discordgo.MessageEmbed{
-		Title:  "Unknown command, use !help command for more information on available commands!",
+		Title:  "Unknown command, use !fhelp command for more information on available commands!",
 		Fields: []*discordgo.MessageEmbedField{},
 		Provider: &discordgo.MessageEmbedProvider{
 			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
