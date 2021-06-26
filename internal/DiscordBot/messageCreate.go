@@ -72,7 +72,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				number := Database.UpdateSession(m.Author.ID, SmsCodesIO.Init(), false)
 				if number != "zerobal" {
 					embedMsg.Title = "+" + number
-					embedMsg.Description = "SmsBot by SlotTalk - Use !code command to retrieve verification code"
+					embedMsg.Description = "SmsBot by SlotTalk - Use !code command to retrieve verification code\n *1 Token has been deducted from your balance"
 
 					embedMsg.Color = 1752220 //aqua color
 					go Database.UpdateBalance(-1, m.Author.ID)
@@ -94,13 +94,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
 			if returnedCode == "err"  {
 				embedMsg.Title = "Message not received yet, try again in a moment"
-				embedMsg.Description = "SmsBot by SlotTalk \n *Your balance is untouched"
+				embedMsg.Description = "SmsBot by SlotTalk"
 				embedMsg.Color = 15158332 //red color
 
 				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 			} else {
 				embedMsg.Title = returnedCode
-				embedMsg.Description = "SmsBot by SlotTalk - Use !balance command to check your balance!\n *1 Token has been deducted from your balance"
+				embedMsg.Description = "SmsBot by SlotTalk - Use !balance command to check your balance!"
 				embedMsg.Color = 3066993 //green color
 				lastSession := Database.GetLastSession(m.Author.ID)
 				go Database.UpdateSession(m.Author.ID, &SmsCodesIO.Session{
