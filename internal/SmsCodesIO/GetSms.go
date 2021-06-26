@@ -41,7 +41,7 @@ func GetSms(session *LastSession) string {
 	jsonPtr := &GetSmsResponse{}
 
 	json.Unmarshal(body, jsonPtr)
-	if jsonPtr.Error == "Non" || jsonPtr.Sms != "Message not received yet" {
+	if jsonPtr.Error == "Non" && jsonPtr.Sms != "Message not received yet" {
 		return jsonPtr.Sms
 	} else {
 		return "Err"
