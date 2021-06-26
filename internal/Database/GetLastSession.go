@@ -22,6 +22,7 @@ func GetLastSession(discordID string) *SmsCodesIO.LastSession {
 		ServiceName: data.LastSession.ServiceName,
 		Number:      data.LastSession.Number,
 		SecurityID:  data.LastSession.SecurityID,
+		IsDisposed:  data.LastSession.IsDisposed,
 	}
 	return lastSession
 }

@@ -7,7 +7,7 @@ import (
 
 var userData SmsCodesIO.UserData
 
-func UpdateSession(discordID string, lastSession *SmsCodesIO.Session) string {
+func UpdateSession(discordID string, lastSession *SmsCodesIO.Session, dispose bool) string {
 	dbsession := getDatabase(false, &DatabaseSession{})
 	dbsession.collectionPtr.FindOne(nil, bson.M{"discord_id": discordID}).Decode(&userData)
 	if userData.ID == ""{
@@ -32,6 +32,7 @@ func UpdateSession(discordID string, lastSession *SmsCodesIO.Session) string {
 					{"service_id", lastSession.ServiceID},
 					{"service_name", lastSession.SerciceName},
 					{"number", lastSession.Number},
-					{"security_id", lastSession.SecurityID}}}}}}).DecodeBytes()
+					{"security_id", lastSession.SecurityID},
+					{"is_disposed", dispose}}}}}}).DecodeBytes()
 	return lastSession.Number
 }

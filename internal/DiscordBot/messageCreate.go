@@ -43,7 +43,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 		Color: 16776960, //yellow color
 		Footer: &discordgo.MessageEmbedFooter{
-			Text:    "Support? Ahmed#6969 or Sithed#4918",
+			Text:    "Support? Sithed#4918",
 			IconURL: "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
 		},
 	}
@@ -51,21 +51,32 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if bool == true {
 		switch key {
 		case 0: //food command
-			number := Database.UpdateSession(m.Author.ID, SmsCodesIO.Init())
+			lastSession := Database.GetLastSession(m.Author.ID)
+			isLastSessionDisposed := !lastSession.IsDisposed
+			if isLastSessionDisposed{
+				embedMsg.Title = "Please use the !code command to dispose previous number before requesting a new one"
+				embedMsg.Description = "SmsBot by SlotTalk"
+				embedMsg.Color = 15158332 //red color
+				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+				return
+			}
+
+			number := Database.UpdateSession(m.Author.ID, SmsCodesIO.Init(), false)
 			if number != "zerobal"{
-				embedMsg.Title = "+" + Database.UpdateSession(m.Author.ID, SmsCodesIO.Init())
+				embedMsg.Title = "+" + number
 				embedMsg.Description = "SmsBot by SlotTalk - Use !code command to retrieve verification code"
 
 				embedMsg.Color = 1752220 //aqua color
 				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 				go s.ChannelMessageSend(directMessage.ID, embedMsg.Title[3:len(embedMsg.Title)]) //stripping off +44
 				return
-			}
-			embedMsg.Title = "No tokens left :("
-			embedMsg.Description = "SmsBot by SlotTalk - Use !topup command to purchase tokens!"
-			embedMsg.Color = 15158332 //red color
+			}else{
+				embedMsg.Title = "No tokens left :("
+				embedMsg.Description = "SmsBot by SlotTalk - Use !topup command to purchase tokens!"
+				embedMsg.Color = 15158332 //red color
+				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 
-			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+			}
 
 		case 1: //code command
 			returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
@@ -79,6 +90,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				embedMsg.Title = returnedCode
 				embedMsg.Description = "SmsBot by SlotTalk - Use !balance command to check your balance!\n *1 Token has been deducted from your balance"
 				embedMsg.Color = 3066993 //green color
+				lastSession := Database.GetLastSession(m.Author.ID)
+				go Database.UpdateSession(m.Author.ID,&SmsCodesIO.Session{
+					ApiKey:      lastSession.Apikey,
+					Country:     lastSession.Country,
+					ServiceID:   lastSession.ServiceID,
+					SerciceName: lastSession.ServiceName,
+					Number:      lastSession.Number,
+					SecurityID:  lastSession.SecurityID,
+				}, true)
 
 				go Database.UpdateBalance(-1, m.Author.ID)
 				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)

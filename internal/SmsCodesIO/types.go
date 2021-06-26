@@ -43,4 +43,5 @@ type LastSession struct {
 	ServiceName string `bson:"service_name"`
 	Number      string `bson:"number"`
 	SecurityID  string `bson:"security_id"`
+	IsDisposed bool `bson:"is_disposed"`
 }
