@@ -189,8 +189,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 			go s.ChannelMessageSendEmbed(userDm.ID, embedMsg)
 			go s.ChannelMessageSendEmbed(os.Getenv("log_channel"), embedMsg)
-
 		}
+
 	default:
 
 		if !isAdmin {

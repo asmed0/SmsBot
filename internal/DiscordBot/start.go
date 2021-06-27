@@ -24,7 +24,11 @@ func start(data *DiscordData) {
 
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
 	//dg.Identify.Intents = discordgo.IntentsDirectMessages //accept dms aswell
-
+	dg.Identify.Presence = discordgo.GatewayStatusUpdate{
+		Game:   discordgo.Activity{
+			Name:          "Use the !fhelp command for more info on available commands!",
+		},
+	}
 
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()

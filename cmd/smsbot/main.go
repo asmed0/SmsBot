@@ -11,7 +11,6 @@ import (
 
 func main() {
 	godotenv.Load()
-
 	raven.SetDSN(os.Getenv("sentry_url"))
 
 	Database.Init()
