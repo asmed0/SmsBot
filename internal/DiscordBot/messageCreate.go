@@ -57,7 +57,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 		Color: 16776960, //yellow color
 		Footer: &discordgo.MessageEmbedFooter{
-			Text:    "SmsBot by SlotTalk | Support? Sithed#4918",
+			Text:    "SmsBot by SlotTalk | Support? Open a ticket!",
 			IconURL: "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
 		},
 	}

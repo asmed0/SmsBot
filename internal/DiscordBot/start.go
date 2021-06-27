@@ -26,7 +26,7 @@ func start(data *DiscordData) {
 	//dg.Identify.Intents = discordgo.IntentsDirectMessages //accept dms aswell
 	dg.Identify.Presence = discordgo.GatewayStatusUpdate{
 		Game:   discordgo.Activity{
-			Name:          "Use the !fhelp command for more info on available commands!",
+			Name:          "Use the !fhelp command for more info on available commands!\nOpen a ticket for further support!",
 		},
 	}
 
