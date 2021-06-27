@@ -9,21 +9,7 @@ import (
 )
 
 func sendLogs(user string, embedMsg *discordgo.MessageEmbed, s *discordgo.Session, discordID string) {
-	embed := &discordgo.MessageEmbed{
-		URL:         embedMsg.URL,
-		Type:        embedMsg.Type,
-		Title:       embedMsg.Title,
-		Description: embedMsg.Description,
-		Timestamp:   embedMsg.Timestamp,
-		Color:       embedMsg.Color,
-		Footer:      embedMsg.Footer,
-		Image:       embedMsg.Image,
-		Thumbnail:   embedMsg.Thumbnail,
-		Video:       embedMsg.Video,
-		Provider:    embedMsg.Provider,
-		Author:      embedMsg.Author,
-		Fields:      embedMsg.Fields,
-	} //we dont want our logs embed to mess with userembed so new mem addr
+	embed := *embedMsg//we dont want our logs embed to mess with userembed so new mem addr
 
 	//opening a log channel
 	logChannel := os.Getenv("log_channel")
@@ -64,5 +50,5 @@ func sendLogs(user string, embedMsg *discordgo.MessageEmbed, s *discordgo.Sessio
 		},
 	}
 	embed.Footer.Text = "SmsBot by SlotTalk | Logs"
-	s.ChannelMessageSendEmbed(logChannel, embed)
+	s.ChannelMessageSendEmbed(logChannel, &embed)
 }
