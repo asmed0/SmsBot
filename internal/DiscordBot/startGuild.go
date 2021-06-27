@@ -9,7 +9,7 @@ import (
 	"syscall"
 )
 
-func start(data *DiscordData) {
+func startGuild(data *DiscordData) {
 
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + data.Token)
@@ -23,7 +23,7 @@ func start(data *DiscordData) {
 	dg.AddHandler(messageCreate)
 
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
-	//dg.Identify.Intents = discordgo.IntentsDirectMessages //accept dms aswell
+
 	dg.Identify.Presence = discordgo.GatewayStatusUpdate{
 		Game:   discordgo.Activity{
 			Name:          "Use the !fhelp command for more info on available commands!\nOpen a ticket for further support!",
@@ -39,7 +39,7 @@ func start(data *DiscordData) {
 	}
 
 	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("DiscordBot is now running")
+	fmt.Println("DiscordBot is now monitoring #commands channel")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc

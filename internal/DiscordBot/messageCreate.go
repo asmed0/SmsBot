@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+var isAdmin bool
+
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -30,15 +32,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	//if is Admin
-	_, isAdmin := tools.Find(m.Member.Roles, os.Getenv("admin_role"))
-
-	//Ignore all messages outside #commands channel if its not an admin
-	if !isAdmin {
-		if m.ChannelID != os.Getenv("commands_channel") {
-			return
-		}
-	}
 
 	//opening a dm channel
 	directMessage, err := s.UserChannelCreate(m.Author.ID)
@@ -46,7 +39,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		raven.CaptureErrorAndWait(err, nil) //shouldnt happen but ait
 		return
 	}
-
 
 	embedMsg := &discordgo.MessageEmbed{
 		Title:  "Unknown command, use !fhelp command for more information on available commands!",
@@ -62,7 +54,26 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 	}
 
+	//Stripping command off prefix
 	command := strings.TrimLeft(strings.ToLower(m.Content), data.Prefix)
+
+	//Ignore all messages outside #commands channel if its not an admin
+	commandsChan := os.Getenv("commands_channel")
+
+	//if is Admin
+	if m.ChannelID != directMessage.ID{
+		_, isAdmin = tools.Find(m.Member.Roles, os.Getenv("admin_role"))
+	}
+
+	if m.ChannelID == directMessage.ID {
+		if command != "code" {
+			return
+		}
+	} else if !isAdmin {
+		if m.ChannelID != commandsChan {
+			return
+		}
+	}
 
 	switch strings.Fields(command)[0] {
 	case "food": //food command
@@ -144,7 +155,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			embedMsg.Fields = append(embedMsg.Fields, &discordgo.MessageEmbedField{
 				Name:   data.Prefix + data.Commands[i][0],
 				Value:  data.Commands[i][1],
-				Inline: false,
+				Inline: true,
 			})
 		} //looping existing commands
 
@@ -152,7 +163,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	case "addtokens": //this is an admin only command! //example: !addtokens 50 @Santa
 		if isAdmin {
-			if len(m.Mentions) < 1{ //no user specified err
+			if len(m.Mentions) < 1 { //no user specified err
 				embedMsg.Title = "No user specified"
 				embedMsg.Description = "!addtokens command example: !addtokens 50 @Santa"
 				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
@@ -160,7 +171,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 			prevBal := Database.GetBalance(m.Mentions[0].ID)
 			toAdd, err := strconv.Atoi(strings.Fields(command)[1])
-			if err != nil{
+			if err != nil {
 				embedMsg.Title = "Incorrect amount to add, try again.."
 				embedMsg.Description = "!addtokens command example: !addtokens 50 @Santa"
 				go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)

@@ -9,5 +9,6 @@ func Init() {
 		Prefix:   config.Prefix,
 		Commands: config.Commands,
 	}
-	start(data)
+	go startDM(data) //extra goroutine for dms
+	startGuild(data)
 }
