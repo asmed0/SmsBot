@@ -76,8 +76,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	if len(strings.Fields(command)[0]) < 1{
+	if len(strings.Fields(command)) < 1{
 		raven.CaptureErrorAndWait(errors.New("No command error: " + strings.Fields(command)[0]), nil)
+		return
 	}
 
 	switch strings.Fields(command)[0] {
