@@ -1,7 +1,6 @@
 package DiscordBot
 
 import (
-	"errors"
 	"github.com/bwmarrin/discordgo"
 	"github.com/getsentry/raven-go"
 	"os"
@@ -77,7 +76,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if len(strings.Fields(command)) < 1{
-		raven.CaptureErrorAndWait(errors.New("No command error: " + strings.Fields(command)[0]), nil)
 		return
 	}
 
