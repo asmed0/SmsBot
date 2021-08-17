@@ -32,7 +32,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-
 	//opening a dm channel
 	directMessage, err := s.UserChannelCreate(m.Author.ID)
 	if err != nil {
@@ -61,7 +60,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	commandsChan := os.Getenv("commands_channel")
 
 	//if is Admin
-	if m.ChannelID != directMessage.ID{
+	if m.ChannelID != directMessage.ID {
 		_, isAdmin = tools.Find(m.Member.Roles, os.Getenv("admin_role"))
 	}
 
@@ -75,7 +74,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	if len(strings.Fields(command)) < 1{
+	if len(strings.Fields(command)) < 1 {
 		return
 	}
 
@@ -139,8 +138,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "topup": //topup command
 		if len(strings.Fields(command)) > 1 {
 			qty, _ := strconv.Atoi(strings.Fields(command)[1])
-			if qty < 1 || qty > 50000 {
-				qty = 10 //default to 10
+			if qty < 5 || qty > 50000 { //no less than 5, no more than 50k
+				qty = 5 //default to 5
 			}
 			embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, qty)
 			embedMsg.Title = "Click here to checkout " + strconv.Itoa(qty) + " tokens"
