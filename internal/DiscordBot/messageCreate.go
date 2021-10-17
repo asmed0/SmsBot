@@ -99,6 +99,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		getNumber(embedMsg, m.Author.ID, "Uber-Eats", -2)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
+	case "other":
+		getNumber(embedMsg, m.Author.ID, "Other", -2)
+		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
+		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
 	case "code": //code command
 		returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
 		if returnedCode == "Err" {
