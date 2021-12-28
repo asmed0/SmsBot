@@ -82,7 +82,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "food": //food command
 		getNumber(embedMsg, m.Author.ID, "Foodora", -1)
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		go s.ChannelMessageSend(directMessage.ID, embedMsg.Title)
+		//if its a number return as bare string for easier mobile copying
+		if strings.Contains(embedMsg.Title, "+"){
+			go s.ChannelMessageSend(directMessage.ID, embedMsg.Title)
+		}
 		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
 	case "wolt":
 		getNumber(embedMsg, m.Author.ID, "Wolt", -2)
