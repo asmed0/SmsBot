@@ -6,7 +6,7 @@ import (
 	"os"
 	"smsbot/configs"
 	"smsbot/internal/Database"
-	"smsbot/internal/SmsCodesIO"
+	"smsbot/internal/FiveSim"
 	"smsbot/internal/Topup"
 	"smsbot/internal/tools"
 	"strconv"
@@ -53,6 +53,237 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		},
 	}
 
+	firstBtn := discordgo.ActionsRow{
+		Components: []discordgo.MessageComponent{
+			discordgo.Button{
+				Emoji: discordgo.ComponentEmoji{
+					Name: "🎢",
+				},
+				Label:    "I'm ready!",
+				Style:    discordgo.SuccessButton,
+				CustomID: "imready",
+			},
+		},
+	}
+
+	componentsHandlers := map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+		"imready": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			getNumber(embedMsg, m.Author.ID, "other", -1)
+			if embedMsg.Color != 15158332 {
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "",
+						Flags:   1 << 6,
+						Embeds:  []*discordgo.MessageEmbed{embedMsg},
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.Button{
+										Emoji: discordgo.ComponentEmoji{
+											Name: "🎰",
+										},
+										Label:    "Request code!",
+										Style:    discordgo.PrimaryButton,
+										CustomID: "getcode",
+									},
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					panic(err)
+				}
+			} else {
+				embedMsg.Description = "If you wish to topup less than 10 tokens (default amount) you can use the !topup command"
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "",
+						Flags:   1 << 6,
+						Embeds:  []*discordgo.MessageEmbed{embedMsg},
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.Button{
+										Emoji: discordgo.ComponentEmoji{
+											Name: "🏦",
+										},
+										Label:    "Click here to topup!",
+										Style:    discordgo.LinkButton,
+										URL: "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, 10),
+									},
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					panic(err)
+				}
+			}
+		},
+		"getcode": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			returnedCode := FiveSim.GetSms(Database.GetLastSession(m.Author.ID))
+			if returnedCode == "Err" {
+				embedMsg.Title = "Message not received yet, try again in a moment"
+				embedMsg.Description = ""
+				embedMsg.Color = 15158332 //red color
+				go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "",
+						Flags:   1 << 6,
+						Embeds:  []*discordgo.MessageEmbed{embedMsg},
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.Button{
+										Emoji: discordgo.ComponentEmoji{
+											Name: "🥠",
+										},
+										Label:    "Request code again!",
+										Style:    discordgo.SecondaryButton,
+										CustomID: "getcode",
+									},
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					panic(err)
+				}
+			} else if returnedCode == "ProviderErr" {
+				embedMsg.Title = "Seems like you took to long to use the number, or our provider had an error."
+				embedMsg.Description = "Your balance has been reimbursed"
+				embedMsg.Color = 15158332 //red color
+				go Database.UpdateBalance(2, m.Author.ID)
+				go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "",
+						Flags:   1 << 6,
+						Embeds:  []*discordgo.MessageEmbed{embedMsg},
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.Button{
+										Emoji: discordgo.ComponentEmoji{
+											Name: "♻️",
+										},
+										Label:    "Request a new number!",
+										Style:    discordgo.PrimaryButton,
+										CustomID: "imready",
+									},
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					panic(err)
+				}
+			} else {
+				embedMsg.Title = returnedCode
+				embedMsg.Description = "Thank you for using our services"
+				embedMsg.Color = 3066993 //green color
+
+				go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "",
+						Flags:   1 << 6,
+						Embeds:  []*discordgo.MessageEmbed{embedMsg},
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.Button{
+										Emoji: discordgo.ComponentEmoji{
+											Name: "💰",
+										},
+										Label:    "Check balance!",
+										Style:    discordgo.PrimaryButton,
+										CustomID: "getbalance",
+									},
+									discordgo.Button{
+										Emoji: discordgo.ComponentEmoji{
+											Name: "♻️",
+										},
+										Label:    "Request new code!",
+										Style:    discordgo.SecondaryButton,
+										CustomID: "getcode",
+									},
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					panic(err)
+				}
+			}
+			lastSession := Database.GetLastSession(m.Author.ID)
+			if returnedCode != "Err" && returnedCode != "ProverErr" {
+				lastSession.Sms = append(lastSession.Sms, FiveSim.SmsSlice{Text: returnedCode})
+			}
+			Database.UpdateSession(m.Author.ID, &FiveSim.FiveSimSession{
+				ApiKey:    lastSession.ApiKey,
+				ID:        lastSession.ID,
+				Phone:     lastSession.Phone,
+				Operator:  lastSession.Country,
+				Product:   lastSession.Product,
+				Price:     lastSession.Price,
+				Status:    lastSession.Status,
+				Expires:   lastSession.Country,
+				Sms:       lastSession.Sms,
+				CreatedAt: lastSession.Country,
+				Country:   lastSession.Country,
+			}, true) //disposing our number
+		},
+		"getbalance": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
+			embedMsg.Description = "Use !topup command to purchase more tokens!\n \n1 successfully retrieved verification code = 1 token redeemed!"
+			embedMsg.Color = 10181046 //purple color
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+					Flags:   1 << 6,
+					Embeds:  []*discordgo.MessageEmbed{embedMsg},
+				},
+			})
+			if err != nil {
+				panic(err)
+			}
+		},
+	}
+	// Components are part of interactions, so we register InteractionCreate handler
+	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		switch i.Type {
+		case discordgo.InteractionMessageComponent:
+			if h, ok := componentsHandlers[i.MessageComponentData().CustomID]; ok {
+				h(s, i)
+			}
+		}
+	})
+	_, err = s.ApplicationCommandCreate(data.AppID, "", &discordgo.ApplicationCommand{
+		Name:        "food",
+		Description: "Request a number",
+	})
+
+	msg := &discordgo.MessageSend{
+		Embeds:     nil,
+		Components: []discordgo.MessageComponent{},
+	}
+
+	msg.Embeds = append(msg.Embeds, embedMsg)
+	msg.Components = append(msg.Components, firstBtn)
+
 	//Stripping command off prefix
 	command := strings.TrimLeft(strings.ToLower(m.Content), data.Prefix)
 
@@ -80,67 +311,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	switch strings.Fields(command)[0] {
 	case "food": //food command
-		getNumber(embedMsg, m.Author.ID, "Foodora", -1)
-		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		//if its a number return as bare string for easier mobile copying
-		if strings.Contains(embedMsg.Title, "+"){
-			go s.ChannelMessageSend(directMessage.ID, embedMsg.Title)
-		}
-		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-	case "wolt":
-		getNumber(embedMsg, m.Author.ID, "Wolt", -2)
-		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-	case "bolt":
-		getNumber(embedMsg, m.Author.ID, "Bolt", -2)
-		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-	case "tier":
-		getNumber(embedMsg, m.Author.ID, "Tier", -2)
-		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-	case "eats":
-		getNumber(embedMsg, m.Author.ID, "Uber-Eats", -2)
-		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-	case "other":
-		getNumber(embedMsg, m.Author.ID, "Other", -2)
-		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-		go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-	case "code": //code command
-		returnedCode := SmsCodesIO.GetSms(Database.GetLastSession(m.Author.ID))
-		if returnedCode == "Err" {
-			embedMsg.Title = "Message not received yet, try again in a moment"
-			embedMsg.Color = 15158332 //red color
-
-			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-			go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-		} else if returnedCode == "ProviderErr" {
-			embedMsg.Title = "Seems like our provider had an error, sorry for this"
-			embedMsg.Description = "Your balance has been reimbursed"
-			embedMsg.Color = 15158332 //red color
-			go Database.UpdateBalance(2, m.Author.ID)
-			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-			go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-		} else {
-			embedMsg.Title = returnedCode
-			embedMsg.Description = "Use !balance command to check your balance!"
-			embedMsg.Color = 3066993 //green color
-
-			go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
-			go sendLogs(m.Author.Username, embedMsg, s, m.Author.ID)
-		}
-
-		lastSession := Database.GetLastSession(m.Author.ID)
-		Database.UpdateSession(m.Author.ID, &SmsCodesIO.Session{
-			ApiKey:      lastSession.Apikey,
-			Country:     lastSession.Country,
-			ServiceID:   lastSession.ServiceID,
-			SerciceName: lastSession.ServiceName,
-			Number:      lastSession.Number,
-			SecurityID:  lastSession.SecurityID,
-		}, true) //disposing our number
-
+		embedMsg.Title = "We urge you to not request a number before you are ready to use it!"
+		embedMsg.Description = "Click the green button below once you are ready :)"
+		go s.ChannelMessageSendComplex(directMessage.ID, msg)
 	case "balance": //balance command
 		embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
 		embedMsg.Description = "Use !topup command to purchase more tokens!\n \n1 successfully retrieved verification code = 1 token redeemed!"
@@ -158,7 +331,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		} else {
 			embedMsg.URL = "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(m.Author.ID, 10) //default 10 tokens
 			embedMsg.Title = "Click here to checkout 10 tokens"
-
 		}
 		embedMsg.Description = "Tokens will automatically be added to your balance after!"
 		embedMsg.Color = 15277667 //pink color
@@ -196,12 +368,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			Database.UpdateBalance(toAdd, m.Mentions[0].ID)
 			embedMsg.Title = m.Mentions[0].Username + "'s token balance has been updated"
 			embedMsg.Fields = []*discordgo.MessageEmbedField{
-				&discordgo.MessageEmbedField{
+				{
 					Name:   "Previous balance",
 					Value:  strconv.Itoa(prevBal),
 					Inline: true,
 				},
-				&discordgo.MessageEmbedField{
+				{
 					Name:   "New balance",
 					Value:  strconv.Itoa(Database.GetBalance(m.Mentions[0].ID)),
 					Inline: true,

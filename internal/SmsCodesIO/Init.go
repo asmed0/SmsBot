@@ -4,13 +4,13 @@ import (
 	"smsbot/configs"
 )
 
-func Init(service string) *Session {
+func Init(service string) *SmsCodesSession {
 	config := configs.SmsCodesIOConfigs(service)
-	session := &Session{
+	session := &SmsCodesSession{
 		ApiKey:      config.Apikey,
 		Country:     config.Country,
 		ServiceID:   config.ServiceID,
-		SerciceName: config.ServiceName,
+		ServiceName: config.ServiceName,
 		Number:      "",
 		SecurityID:  "",
 	}

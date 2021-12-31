@@ -2,12 +2,13 @@ package Database
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
+	"smsbot/internal/FiveSim"
 	"smsbot/internal/SmsCodesIO"
 )
 
 var userData SmsCodesIO.UserData
 
-func UpdateSession(discordID string, lastSession *SmsCodesIO.Session, dispose bool) string {
+func UpdateSession(discordID string, lastSession *FiveSim.FiveSimSession, dispose bool) string {
 	dbsession := getDatabase(false, &DatabaseSession{})
 	dbsession.collectionPtr.FindOne(nil, bson.M{"discord_id": discordID}).Decode(&userData)
 	if userData.ID == ""{
@@ -28,11 +29,16 @@ func UpdateSession(discordID string, lastSession *SmsCodesIO.Session, dispose bo
 			{"$set", bson.D{
 				{"last_session", bson.D{
 					{"apikey", lastSession.ApiKey},
+					{"id", lastSession.ID},
+					{"phone", lastSession.Phone},
+					{"operator", lastSession.Operator},
+					{"product", lastSession.Product},
+					{"price", lastSession.Price},
+					{"status", lastSession.Status},
+					{"expires", lastSession.Expires},
+					{"sms", lastSession.Sms},
+					{"created_at", lastSession.CreatedAt},
 					{"country", lastSession.Country},
-					{"service_id", lastSession.ServiceID},
-					{"service_name", lastSession.SerciceName},
-					{"number", lastSession.Number},
-					{"security_id", lastSession.SecurityID},
 					{"is_disposed", dispose}}}}}}).DecodeBytes()
-	return lastSession.Number
+	return lastSession.Phone
 }

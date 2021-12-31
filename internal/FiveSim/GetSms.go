@@ -1,4 +1,4 @@
-package SmsCodesIO
+package FiveSim
 
 import (
 	"encoding/json"
@@ -6,30 +6,29 @@ import (
 	"github.com/getsentry/raven-go"
 	"io/ioutil"
 	"net/http"
-	"syscall"
+	"strings"
 )
 
-func getNumber(data *SmsCodesSession) {
-
-	url := "https://admin.smscodes.io/api/sms/GetServiceNumber?key=" + data.ApiKey +
-		"&iso=" + data.Country +
-		"&serv=" + data.ServiceID
+func GetSms(session *FiveSimLastSession) string {
+	url := fmt.Sprintf("https://5sim.net/v1/user/check/%s",
+		session.ID)
 
 	method := "GET"
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s",session.ApiKey))
 
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
-		return
+		return "Err"
 	}
 	res, err := client.Do(req)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
-		return
+		return "Err"
 	}
 	defer res.Body.Close()
 
@@ -37,17 +36,17 @@ func getNumber(data *SmsCodesSession) {
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
 		fmt.Println(err)
-		return
+		return "Err"
 	}
-	jsonPtr := &GetNumberResponse{}
+
+	jsonPtr := &GetSmsResponse{}
 
 	json.Unmarshal(body, jsonPtr)
-	if jsonPtr.Error == "Non" {
-		data.Number = jsonPtr.Number
-		data.SecurityID = jsonPtr.SecurityID
-	} else {
-		raven.CaptureErrorAndWait(err, nil)
-		fmt.Println(jsonPtr.Error)
-		syscall.Exit(-1)
+	if len(jsonPtr.Sms) > 0{
+		return jsonPtr.Sms[0].Text
+	} else if strings.ToUpper(jsonPtr.Status) == "TIMEOUT"{
+		return "ProviderErr"
+	}else{
+		return "Err"
 	}
 }

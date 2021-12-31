@@ -4,7 +4,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"os"
 	"smsbot/internal/Database"
-	"smsbot/internal/SmsCodesIO"
+	"smsbot/internal/FiveSim"
 	"strconv"
 )
 
@@ -18,36 +18,36 @@ func sendLogs(user string, embedMsg *discordgo.MessageEmbed, s *discordgo.Sessio
 	lastSession := Database.GetLastSession(discordID)
 
 	embed.Fields = []*discordgo.MessageEmbedField{
-		&discordgo.MessageEmbedField{
+		{
 			Name:   "User",
 			Value:  "<@" + discordID + ">",
 			Inline: true,
-		},
-		&discordgo.MessageEmbedField{
+				},
+		{
 			Name:   "Balance",
 			Value:  strconv.Itoa(Database.GetBalance(discordID)),
 			Inline: true,
-		},
-		&discordgo.MessageEmbedField{
+				},
+		{
 			Name:   "Service",
-			Value:  lastSession.ServiceName,
+			Value:  lastSession.Product,
 			Inline: true,
-		},
-		&discordgo.MessageEmbedField{
+				},
+		{
 			Name:   "Number",
-			Value:  lastSession.Number,
+			Value:  lastSession.Phone,
 			Inline: true,
-		},
-		&discordgo.MessageEmbedField{
+				},
+		{
 			Name:   "Disposed",
 			Value:  strconv.FormatBool(lastSession.IsDisposed),
 			Inline: true,
-		},
-		&discordgo.MessageEmbedField{
+				},
+		{
 			Name:   "SMS",
-			Value:  SmsCodesIO.GetSms(lastSession),
+			Value:  FiveSim.GetSms(lastSession),
 			Inline: true,
-		},
+				},
 	}
 	embed.Footer.Text = "SmsBot by SlotTalk | Logs"
 	s.ChannelMessageSendEmbed(logChannel, &embed)

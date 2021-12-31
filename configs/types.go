@@ -10,6 +10,7 @@ type DBStruct struct {
 
 type DBotStruct struct {
 	Token string
+	AppID string
 	Prefix string
 	Commands [][]string
 }
@@ -20,4 +21,16 @@ type SmsCodesIOStruct struct {
 	ServiceID string
 	ServiceName string
 	Price int
+}
+
+type FiveSimStruct struct {
+	Apikey string
+	Operator string
+	Product string
+	Price string
+	Status string
+	Expires string
+	Sms []string
+	CreatedAt string
+	Country string
 }

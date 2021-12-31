@@ -1,10 +1,10 @@
 package SmsCodesIO
 
-type Session struct {
+type SmsCodesSession struct {
 	ApiKey      string `json:"apikey"`
 	Country     string `json:"country"`
 	ServiceID   string `json:"service_id"`
-	SerciceName string `json:"sercice_name"`
+	ServiceName string `json:"sercice_name"`
 
 	Number     string `json:"number"`
 	SecurityID string `json:"security_id"`
