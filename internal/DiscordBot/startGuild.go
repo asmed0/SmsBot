@@ -37,6 +37,7 @@ func startGuild(data *DiscordData) {
 		fmt.Println("error opening connection,", err)
 		return
 	}
+	
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("DiscordBot is now monitoring #commands channel")

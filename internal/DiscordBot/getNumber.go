@@ -9,16 +9,6 @@ import (
 
 func getNumber(embedMsg *discordgo.MessageEmbed, discordID string, service string, price int) {
 	if !(Database.GetBalance(discordID) <= 0) {
-		lastSession := Database.GetLastSession(discordID)
-		if lastSession.ApiKey != "" {
-			isLastSessionDisposed := !lastSession.IsDisposed
-			if isLastSessionDisposed {
-				embedMsg.Title = "Please use the !code command to dispose previous number before requesting a new one"
-				embedMsg.Color = 1752220 //red color
-				return
-			}
-		}
-
 		number := Database.UpdateSession(discordID, FiveSim.Init(service), false)
 		if number != "zerobal" {
 			embedMsg.Title = number
