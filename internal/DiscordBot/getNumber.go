@@ -14,7 +14,7 @@ func getNumber(embedMsg *discordgo.MessageEmbed, discordID string, service strin
 			isLastSessionDisposed := !lastSession.IsDisposed
 			if isLastSessionDisposed {
 				embedMsg.Title = "Please use the !code command to dispose previous number before requesting a new one"
-				embedMsg.Color = 15158332 //red color
+				embedMsg.Color = 1752220 //red color
 				return
 			}
 		}
