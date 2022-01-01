@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/getsentry/raven-go"
+	"log"
 	"os"
 	"os/signal"
-	"syscall"
 )
 
 func startGuild(data *DiscordData) {
@@ -29,22 +29,18 @@ func startGuild(data *DiscordData) {
 			Name:          "Use the !fhelp command for more info on available commands!\nOpen a ticket for further support!",
 		},
 	}
+	dg.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
+		log.Println("Bot session is online!")
+	})
 
-	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()
 	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		fmt.Println("error opening connection,", err)
-		return
+		log.Fatalf("Cannot open the session: %v", err)
 	}
-	
+	defer dg.Close()
 
-	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("DiscordBot is now monitoring #commands channel")
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
-
-	// Cleanly close down the Discord session.
-	dg.Close()
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+	<-stop
+	log.Println("Graceful shutdown")
 }
