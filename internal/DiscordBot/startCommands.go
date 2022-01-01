@@ -136,9 +136,9 @@ var (
 				}
 			} else if returnedCode == "ProviderErr" {
 				embedMsg.Title = "Seems like you took to long to use the number, or our provider had an error."
-				embedMsg.Description = "Your balance has been reimbursed"
+				//embedMsg.Description = "If this is an issue on our end, contact Sithed"
 				embedMsg.Color = 15158332 //red color
-				go Database.UpdateBalance(2, i.Interaction.User.ID)
+				//go Database.UpdateBalance(1, i.Interaction.User.ID)
 				go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -257,7 +257,6 @@ func startCommands(data *DiscordData) {
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := componentsHandlers[i.MessageComponentData().CustomID]; ok {
 			h(s, i)
-
 		}
 	})
 
