@@ -47,6 +47,7 @@ var (
 	componentsHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"imready": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			getNumber(embedMsg, i.Interaction.User.ID, "other", -1)
+			go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 			if embedMsg.Color != 15158332 {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -75,6 +76,7 @@ var (
 				}
 			} else {
 				embedMsg.Description = "If you wish to topup less than 10 tokens (default amount) you can use the !topup command"
+				go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
@@ -256,6 +258,19 @@ func startCommands(data *DiscordData) {
 	// Components are part of interactions, so we register InteractionCreate handler
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := componentsHandlers[i.MessageComponentData().CustomID]; ok {
+			embedMsg = &discordgo.MessageEmbed{
+				Title:  "Unknown command, use !fhelp command for more information on available commands!",
+				Fields: []*discordgo.MessageEmbedField{},
+				Provider: &discordgo.MessageEmbedProvider{
+					URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
+					Name: "SlotTalk SMSBOT",
+				},
+				Color: 16776960, //yellow color
+				Footer: &discordgo.MessageEmbedFooter{
+					Text:    "SmsBot by SlotTalk | Support? Open a ticket!",
+					IconURL: "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
+				},
+			}
 			h(s, i)
 		}
 	})
