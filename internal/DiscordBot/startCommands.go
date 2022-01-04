@@ -258,19 +258,7 @@ func startCommands(data *DiscordData) {
 	// Components are part of interactions, so we register InteractionCreate handler
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := componentsHandlers[i.MessageComponentData().CustomID]; ok {
-			embedMsg = &discordgo.MessageEmbed{
-				Title:  "Unknown command, use !fhelp command for more information on available commands!",
-				Fields: []*discordgo.MessageEmbedField{},
-				Provider: &discordgo.MessageEmbedProvider{
-					URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
-					Name: "SlotTalk SMSBOT",
-				},
-				Color: 16776960, //yellow color
-				Footer: &discordgo.MessageEmbedFooter{
-					Text:    "SmsBot by SlotTalk | Support? Open a ticket!",
-					IconURL: "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
-				},
-			}
+			embedCleaner(embedMsg) // cleaning the embed since previous usage
 			h(s, i)
 		}
 	})
