@@ -52,7 +52,7 @@ var (
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "",
+						Content: embedMsg.Title,
 						Flags:   1 << 6,
 						Embeds:  []*discordgo.MessageEmbed{embedMsg},
 						Components: []discordgo.MessageComponent{
