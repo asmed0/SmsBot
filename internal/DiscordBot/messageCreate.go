@@ -1,6 +1,7 @@
 package DiscordBot
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/getsentry/raven-go"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"smsbot/internal/tools"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var isAdmin bool
@@ -153,9 +155,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 	default:
-
 		if !isAdmin {
-			go s.ChannelMessageSendEmbed(m.ChannelID, embedMsg) //if member writes unknown message give them fhelp embed
+			fmt.Sprintf("[%v]unknown command: %s ", time.Now(), m.Content)//if member writes unknown message give them fhelp embed
 		}
 	}
 }
