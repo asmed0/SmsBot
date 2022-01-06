@@ -47,7 +47,6 @@ var (
 	componentsHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"imready": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			getNumber(embedMsg, i.Interaction.User.ID, "other", -1)
-			go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 			if embedMsg.Color != 15158332 {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -76,7 +75,6 @@ var (
 				}
 			} else {
 				embedMsg.Description = "If you wish to topup less than 10 tokens (default amount) you can use the !topup command"
-				go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
@@ -110,7 +108,6 @@ var (
 				embedMsg.Title = "Message not received yet, try again in a moment"
 				embedMsg.Description = ""
 				embedMsg.Color = 15158332 //red color
-				go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
@@ -141,7 +138,6 @@ var (
 				//embedMsg.Description = "If this is an issue on our end, contact Sithed"
 				embedMsg.Color = 15158332 //red color
 				//go Database.UpdateBalance(1, i.Interaction.User.ID)
-				go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
@@ -190,7 +186,6 @@ var (
 					Country:   lastSession.Country,
 				}, true) //disposing our number
 
-				go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
@@ -260,6 +255,7 @@ func startCommands(data *DiscordData) {
 		if h, ok := componentsHandlers[i.MessageComponentData().CustomID]; ok {
 			embedCleaner(embedMsg) // cleaning the embed since previous usage
 			h(s, i)
+			go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 		}
 	})
 
