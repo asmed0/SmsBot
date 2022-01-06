@@ -253,7 +253,7 @@ func startCommands(data *DiscordData) {
 	// Components are part of interactions, so we register InteractionCreate handler
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := componentsHandlers[i.MessageComponentData().CustomID]; ok {
-			embedCleaner(embedMsg) // cleaning the embed since previous usage
+			embedMsg = embedCleaner() // cleaning the embed since previous usage
 			h(s, i)
 			go sendLogs(i.Interaction.User.Username, embedMsg, s, i.Interaction.User.ID)
 		}

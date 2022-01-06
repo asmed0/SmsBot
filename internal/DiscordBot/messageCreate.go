@@ -76,20 +76,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	switch strings.Fields(command)[0] {
 	case "food": //food command
-		embedCleaner(embedMsg) // cleaning the embed since previous usage
+		embedMsg = embedCleaner() // cleaning the embed since previous usage
 		embedMsg.Title = "We urge you to not request a number before you are ready to use it!"
 		embedMsg.Description = "Click the green button below once you are ready :)"
 		embedMsg.Color = 16776960
 		go s.ChannelMessageSendComplex(directMessage.ID, msg)
 	case "balance": //balance command
-		embedCleaner(embedMsg) // cleaning the embed since previous usage
+		embedMsg = embedCleaner() // cleaning the embed since previous usage
 		embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
 		embedMsg.Description = "Use !topup command to purchase more tokens!\n \n1 successfully retrieved verification code = 1 token redeemed!"
 		embedMsg.Color = 10181046 //purple color
 
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 	case "topup": //topup command
-		embedCleaner(embedMsg) // cleaning the embed since previous usage
+		embedMsg = embedCleaner() // cleaning the embed since previous usage
 		if len(strings.Fields(command)) > 1 {
 			qty, _ := strconv.Atoi(strings.Fields(command)[1])
 			if qty < 5 || qty > 50000 { //no less than 5, no more than 50k
@@ -106,7 +106,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 
 	case "fhelp": //fhelp command
-		embedCleaner(embedMsg) // cleaning the embed since previous usage
+		embedMsg = embedCleaner() // cleaning the embed since previous usage
 		embedMsg.Title = "Available commands below"
 		for i := 0; i < len(data.Commands); i++ {
 			embedMsg.Fields = append(embedMsg.Fields, &discordgo.MessageEmbedField{
@@ -119,7 +119,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		go s.ChannelMessageSendEmbed(directMessage.ID, embedMsg)
 
 	case "addtokens": //this is an admin only command! //example: !addtokens 50 @Santa
-		embedCleaner(embedMsg) // cleaning the embed since previous usage
+		embedMsg = embedCleaner() // cleaning the embed since previous usage
 		if isAdmin {
 			if len(m.Mentions) < 1 { //no user specified err
 				embedMsg.Title = "No user specified"
