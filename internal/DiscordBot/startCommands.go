@@ -8,6 +8,7 @@ import (
 	"smsbot/internal/Database"
 	"smsbot/internal/FiveSim"
 	"smsbot/internal/Topup"
+	"smsbot/internal/tools"
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
@@ -165,7 +166,7 @@ var (
 				}
 			} else {
 				embedMsg.Title = returnedCode
-				embedMsg.Description = "Thank you for using our services"
+				embedMsg.Description = "Thank you for using our services, above is an auto-generated 200/70 voucher"
 				embedMsg.Color = 3066993 //green color
 
 				lastSession := Database.GetLastSession(i.Interaction.User.ID)
@@ -189,7 +190,7 @@ var (
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "",
+						Content: tools.DiscountGen(),
 						Flags:   1 << 6,
 						Embeds:  []*discordgo.MessageEmbed{embedMsg},
 						Components: []discordgo.MessageComponent{

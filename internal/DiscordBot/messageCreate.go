@@ -46,7 +46,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		Components: []discordgo.MessageComponent{},
 	}
 
-	msg.Embeds = append(msg.Embeds, embedMsg)
+	msg.Embed = embedMsg
 	msg.Components = append(msg.Components, firstBtn)
 
 	//Stripping command off prefix
@@ -76,7 +76,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	switch strings.Fields(command)[0] {
 	case "food": //food command
-		embedMsg = embedCleaner() // cleaning the embed since previous usage
+		//embedMsg = embedCleaner() // cleaning the embed since previous usage
 		embedMsg.Title = "We urge you to not request a number before you are ready to use it!"
 		embedMsg.Description = "Click the green button below once you are ready :)"
 		embedMsg.Color = 16776960
