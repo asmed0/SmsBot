@@ -9,7 +9,7 @@ func FiveSimConfigs(service string) *FiveSimStruct {
 	apikey := os.Getenv("5sim_apikey")
 	services := [][]string{
 		//servicename, opeator, country
-		{"other","any", "russia"},
+		{"other","any", "india"},
 	}
 	//service slice handling
 	srvc := tools.SliceSlicer(services)
