@@ -55,7 +55,15 @@ func getNumber(data *FiveSimSession) {
 		data.CreatedAt = jsonPtr.CreatedAt
 		data.Country = jsonPtr.Country
 	} else {
-		data.Operator = "virtual27"
-		getNumber(data)
+		if data.Operator != "virtual27"{
+			data.Operator = "virtual27"
+			getNumber(data)
+		}else if data.Country != "india"{
+			data.Operator = "any"
+			data.Country = "india"
+			getNumber(data)
+		}else{
+			data.Phone = "NUMBERS ARE ALL OOS NOW PLEASE TRY AGAIN LATER"
+		}
 	}
 }
