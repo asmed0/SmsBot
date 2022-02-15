@@ -7,11 +7,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"syscall"
 )
 
 func getNumber(data *FiveSimSession) {
-
 	url := fmt.Sprintf("https://5sim.net/v1/user/buy/activation/%s/%s/%s",
 		data.Country,
 		data.Operator,
@@ -57,8 +55,7 @@ func getNumber(data *FiveSimSession) {
 		data.CreatedAt = jsonPtr.CreatedAt
 		data.Country = jsonPtr.Country
 	} else {
-		raven.CaptureErrorAndWait(err, nil)
-		fmt.Println(body)
-		syscall.Exit(-1)
+		data.Operator = "virtual27"
+		getNumber(data)
 	}
 }
