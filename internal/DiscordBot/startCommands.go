@@ -34,6 +34,7 @@ var (
 	}
 	infoEmbed = &discordgo.MessageEmbed{
 		Title:  "YOU HAVE TO PUT IN A FAULTY SMS RESPONSE BEFORE REQUESTING THE CODE",
+		Description: "**For better success wait 30 seconds between each code request!**",
 		Fields: []*discordgo.MessageEmbedField{},
 		Provider: &discordgo.MessageEmbedProvider{
 			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
@@ -43,6 +44,7 @@ var (
 	}
 	infoEmbed2 = &discordgo.MessageEmbed{
 		Title:  "FÖR ATT FÅ EN KOD MÅSTE MAN FÖRST SKRIVA IN EN FELAKTIG KOD, T.EX 1337",
+		Description: "**För bästa resultat vänta 30 sekunder mellan varje försök att requesta code!**",
 		Fields: []*discordgo.MessageEmbedField{},
 		Provider: &discordgo.MessageEmbedProvider{
 			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
