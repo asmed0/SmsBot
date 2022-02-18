@@ -52,7 +52,7 @@ var (
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
-						Content: "**FÖR ATT FÅ EN KOD MÅSTE MAN FÖRST SKRIVA IN EN FELAKTIG KOD, T.EX 1337**\n" +embedMsg.Title,
+						Content: "**YOU HAVE TO PUT IN A FAULTY SMS RESPONSE BEFORE REQUESTING THE CODE.**\n**FÖR ATT FÅ EN KOD MÅSTE MAN FÖRST SKRIVA IN EN FELAKTIG KOD, T.EX 1337**\n" +embedMsg.Title,
 						Flags:   1 << 6,
 						Embeds:  []*discordgo.MessageEmbed{embedMsg},
 						Components: []discordgo.MessageComponent{
