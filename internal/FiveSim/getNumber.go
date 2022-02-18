@@ -19,7 +19,7 @@ func getNumber(data *FiveSimSession) {
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, nil)
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s",data.ApiKey))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", data.ApiKey))
 
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
@@ -54,16 +54,14 @@ func getNumber(data *FiveSimSession) {
 		data.Sms = jsonPtr.Sms
 		data.CreatedAt = jsonPtr.CreatedAt
 		data.Country = jsonPtr.Country
+	} else if data.Operator != "virtual2" {
+		data.Operator = "virtual2"
+		getNumber(data)
+	} else if data.Country != "india" {
+		data.Operator = "any"
+		data.Country = "india"
+		getNumber(data)
 	} else {
-		if data.Operator != "virtual15"{
-			data.Operator = "virtual15"
-			getNumber(data)
-		}else if data.Country != "india"{
-			data.Operator = "any"
-			data.Country = "india"
-			getNumber(data)
-		}else{
-			data.Phone = "NUMBERS ARE ALL OOS NOW PLEASE TRY AGAIN LATER"
-		}
+		data.Phone = "NUMBERS ARE ALL OOS NOW PLEASE TRY AGAIN LATER"
 	}
 }
