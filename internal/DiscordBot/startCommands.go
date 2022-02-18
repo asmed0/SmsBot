@@ -34,17 +34,21 @@ var (
 	}
 	infoEmbed = &discordgo.MessageEmbed{
 		Title:  "YOU HAVE TO PUT IN A FAULTY SMS RESPONSE BEFORE REQUESTING THE CODE",
-		Description: "FÖR ATT FÅ EN KOD MÅSTE MAN FÖRST SKRIVA IN EN FELAKTIG KOD, T.EX 1337",
 		Fields: []*discordgo.MessageEmbedField{},
 		Provider: &discordgo.MessageEmbedProvider{
 			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
 			Name: "SlotTalk SMSBOT",
 		},
 		Color: 16776960, //yellow color
-		Footer: &discordgo.MessageEmbedFooter{
-			Text:    "SmsBot by SlotTalk | Support? Open a ticket!",
-			IconURL: "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
+	}
+	infoEmbed2 = &discordgo.MessageEmbed{
+		Title:  "FÖR ATT FÅ EN KOD MÅSTE MAN FÖRST SKRIVA IN EN FELAKTIG KOD, T.EX 1337",
+		Fields: []*discordgo.MessageEmbedField{},
+		Provider: &discordgo.MessageEmbedProvider{
+			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
+			Name: "SlotTalk SMSBOT",
 		},
+		Color: 16776960, //yellow color
 	}
 
 	firstBtn = discordgo.ActionsRow{
@@ -68,7 +72,7 @@ var (
 					Data: &discordgo.InteractionResponseData{
 						Content: embedMsg.Title,
 						Flags:   1 << 6,
-						Embeds:  []*discordgo.MessageEmbed{embedMsg,infoEmbed},
+						Embeds:  []*discordgo.MessageEmbed{embedMsg,infoEmbed, infoEmbed2},
 						Components: []discordgo.MessageComponent{
 							discordgo.ActionsRow{
 								Components: []discordgo.MessageComponent{
