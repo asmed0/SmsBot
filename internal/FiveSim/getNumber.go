@@ -58,7 +58,7 @@ func getNumber(data *FiveSimSession) {
 		data.Operator = "virtual15"
 		getNumber(data)
 	} else if data.Operator != "virtual1" {
-		data.Operator = "virtual1"
+		data.Operator = "virtual27"
 		getNumber(data)
 	} else if data.Country != "india" {
 		data.Operator = "any"
