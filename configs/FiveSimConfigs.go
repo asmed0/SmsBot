@@ -10,6 +10,7 @@ func FiveSimConfigs(service string) *FiveSimStruct {
 	services := [][]string{
 		//servicename, opeator, country
 		{"other","virtual27", "russia"},
+		{"bolt","any", "france"},
 	}
 	//service slice handling
 	srvc := tools.SliceSlicer(services)

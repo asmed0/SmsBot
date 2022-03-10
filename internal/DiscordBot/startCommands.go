@@ -19,7 +19,21 @@ var s *discordgo.Session
 // Important note: call every command in order it's placed in the example.
 
 var (
+
 	embedMsg = &discordgo.MessageEmbed{
+		Title:  "Unknown command, use !fhelp command for more information on available commands!",
+		Fields: []*discordgo.MessageEmbedField{},
+		Provider: &discordgo.MessageEmbedProvider{
+			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
+			Name: "SlotTalk SMSBOT",
+		},
+		Color: 16776960, //yellow color
+		Footer: &discordgo.MessageEmbedFooter{
+			Text:    "SmsBot by SlotTalk | Support? Open a ticket!",
+			IconURL: "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
+		},
+	}
+	boltMsg = &discordgo.MessageEmbed{
 		Title:  "Unknown command, use !fhelp command for more information on available commands!",
 		Fields: []*discordgo.MessageEmbedField{},
 		Provider: &discordgo.MessageEmbedProvider{
@@ -62,6 +76,18 @@ var (
 				Label:    "I'm ready!",
 				Style:    discordgo.SuccessButton,
 				CustomID: "imready",
+			},
+		},
+	}
+	boltBtn = discordgo.ActionsRow{
+		Components: []discordgo.MessageComponent{
+			discordgo.Button{
+				Emoji: discordgo.ComponentEmoji{
+					Name: "🎢",
+				},
+				Label:    "Request Bolt number!",
+				Style:    discordgo.SuccessButton,
+				CustomID: "bolt",
 			},
 		},
 	}
@@ -256,6 +282,64 @@ var (
 			})
 			if err != nil {
 				fmt.Println(err)
+			}
+		},
+
+		"bolt": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			getNumber(embedMsg, i.Interaction.User.ID, "bolt", -2)
+			if embedMsg.Color != 15158332 {
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: embedMsg.Title,
+						Flags:   1 << 6,
+						Embeds:  []*discordgo.MessageEmbed{embedMsg},
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.Button{
+										Emoji: discordgo.ComponentEmoji{
+											Name: "🎰",
+										},
+										Label:    "Request code!",
+										Style:    discordgo.PrimaryButton,
+										CustomID: "getcode",
+									},
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					fmt.Println(err)
+				}
+			} else {
+				embedMsg.Description = "If you wish to topup less than 10 tokens (default amount) you can use the !topup command"
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "",
+						Flags:   1 << 6,
+						Embeds:  []*discordgo.MessageEmbed{embedMsg},
+						Components: []discordgo.MessageComponent{
+							discordgo.ActionsRow{
+								Components: []discordgo.MessageComponent{
+									discordgo.Button{
+										Emoji: discordgo.ComponentEmoji{
+											Name: "🏦",
+										},
+										Label: "Click here to topup!",
+										Style: discordgo.LinkButton,
+										URL:   "https://checkout.stripe.com/pay/" + Topup.CreateCheckoutSession(i.Interaction.User.ID, 10),
+									},
+								},
+							},
+						},
+					},
+				})
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 		},
 	}

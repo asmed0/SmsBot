@@ -18,6 +18,10 @@ func Init(service string) *FiveSimSession {
 		CreatedAt: config.CreatedAt,
 		Country:     config.Country,
 	}
-	getNumber(session)
+	if service == "bolt"{
+		getBolt(session)
+	}else {
+		getNumber(session)
+	}
 	return session
 }

@@ -49,6 +49,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	msg.Embed = embedMsg
 	msg.Components = append(msg.Components, firstBtn)
 
+	boltmsg := &discordgo.MessageSend{
+		Embeds:     nil,
+		Components: []discordgo.MessageComponent{},
+	}
+
+	boltmsg.Embed = boltMsg
+	boltmsg.Components = append(boltmsg.Components, boltBtn)
+
 	//Stripping command off prefix
 	command := strings.TrimLeft(strings.ToLower(m.Content), data.Prefix)
 
@@ -76,11 +84,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	switch strings.Fields(command)[0] {
 	case "food": //food command
-		//embedMsg = embedCleaner() // cleaning the embed since previous usage
+		// embedMsg = embedCleaner() // cleaning the embed since previous usage
 		embedMsg.Title = "We urge you to not request a number before you are ready to use it!"
 		embedMsg.Description = "Click the green button below once you are ready :)"
 		embedMsg.Color = 16776960
 		go s.ChannelMessageSendComplex(directMessage.ID, msg)
+	case "bolt": //bolt command
+		boltMsg.Title = "We urge you to not request a number before you are ready to use it!"
+		boltMsg.Description = "Click the green button below once you are ready :)"
+		boltMsg.Color = 16776960
+		go s.ChannelMessageSendComplex(directMessage.ID, boltmsg)
 	case "balance": //balance command
 		embedMsg = embedCleaner() // cleaning the embed since previous usage
 		embedMsg.Title = strconv.Itoa(Database.GetBalance(m.Author.ID)) + " Tokens left"
