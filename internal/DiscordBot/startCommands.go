@@ -93,7 +93,7 @@ var (
 	}
 	componentsHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"imready": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			getNumber(embedMsg, i.Interaction.User.ID, "other", -1)
+			getNumber(embedMsg, i.Interaction.User.ID, "other", -2)
 			if embedMsg.Color != 15158332 {
 				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
