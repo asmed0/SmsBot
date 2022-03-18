@@ -47,18 +47,8 @@ var (
 		},
 	}
 	infoEmbed = &discordgo.MessageEmbed{
-		Title:  "YOU HAVE TO PUT IN A FAULTY SMS RESPONSE BEFORE REQUESTING THE CODE",
-		Description: "**For better success wait 30 seconds between each code request!**",
-		Fields: []*discordgo.MessageEmbedField{},
-		Provider: &discordgo.MessageEmbedProvider{
-			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
-			Name: "SlotTalk SMSBOT",
-		},
-		Color: 16776960, //yellow color
-	}
-	infoEmbed2 = &discordgo.MessageEmbed{
-		Title:  "FÖR ATT FÅ EN KOD MÅSTE MAN FÖRST SKRIVA IN EN FELAKTIG KOD, T.EX 1337",
-		Description: "**För bästa resultat vänta 30 sekunder mellan varje försök att requesta code!**",
+		Title:  "+1 == Kanada",
+		Description: "**Landskoden +1 är för Kanada**",
 		Fields: []*discordgo.MessageEmbedField{},
 		Provider: &discordgo.MessageEmbedProvider{
 			URL:  "https://cdn.discordapp.com/icons/806511362251030558/244ed44d2ab37a59e37bb775de0d8fcb.png?size=256",
@@ -100,7 +90,7 @@ var (
 					Data: &discordgo.InteractionResponseData{
 						Content: embedMsg.Title,
 						Flags:   1 << 6,
-						Embeds:  []*discordgo.MessageEmbed{embedMsg,infoEmbed, infoEmbed2},
+						Embeds:  []*discordgo.MessageEmbed{embedMsg,infoEmbed},
 						Components: []discordgo.MessageComponent{
 							discordgo.ActionsRow{
 								Components: []discordgo.MessageComponent{
