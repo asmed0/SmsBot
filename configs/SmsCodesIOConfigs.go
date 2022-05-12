@@ -9,7 +9,7 @@ func SmsCodesIOConfigs(service string) *SmsCodesIOStruct {
 	apikey := os.Getenv("smscodes_apikey")
 	services := [][]string{
 		//servicename, serviceid, country, price
-		{"Foodora","462f7a96-98e9-44a5-9407-47d3104519bd", "NL"},
+		{"Foodora","462f7a96-98e9-44a5-9407-47d3104519bd", "UK"},
 		{"Wolt","fe8f0b2c-510c-4d72-bbc0-327c141b4054", "UK"},
 		{"Bolt","f8eb0240-dfb8-422b-8b9a-04f0c6fe6dee", "UK"},
 		{"Tier","6d91fec7-24d5-4feb-98b9-1bebda232213", "UK"},
