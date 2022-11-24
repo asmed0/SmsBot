@@ -1,6 +1,8 @@
 # Discord SmsBot
 
-Functioning discordbot that is coonected to both 5Sim and SMSCodes API and gets SMS for the users. Users balances can be topped up using Stripe.
+Functioning Discord Bot that is coonected to both 5Sim and SMSCodes API and gets SMS for the users. 
+Users balances can be topped up using Stripe. Everything is automatic and any balance can be topped up. 
+See help command for available commands
 
 ## Usage
 
